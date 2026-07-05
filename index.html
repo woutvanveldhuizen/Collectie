@@ -1,0 +1,1487 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0f14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Collectie">
+  <title>Collectie v0.1.0-dev5</title>
+
+  <style>
+    /* ============================================================
+       COLLECTIE APP — v0.1.0-dev5
+       CSS-INHOUDSOPGAVE
+       1. Design tokens
+       2. Reset & basis
+       3. App shell
+       4. Componenten
+       5. Dashboard
+       6. Pagina's
+       7. Formulieren / foundation
+       8. Grafiek placeholder
+       9. Analyse
+       10. Responsiviteit
+       ============================================================ */
+
+    /* 1. Design tokens */
+    :root {
+      --bg: #090d12;
+      --bg-soft: #10161d;
+      --card: #141b23;
+      --card-2: #19222c;
+      --card-3: #1f2a36;
+      --text: #f5f7fb;
+      --muted: #9aa7b5;
+      --muted-2: #687686;
+      --line: rgba(255,255,255,.08);
+      --accent: #35d07f;
+      --accent-soft: rgba(53,208,127,.14);
+      --warning: #f2c94c;
+      --danger: #ff5d73;
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 28px;
+      --shadow: 0 24px 70px rgba(0,0,0,.35);
+      --max-width: 440px;
+      --tap: 48px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* 2. Reset & basis */
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
+    body {
+      min-height: 100%;
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at 50% -8%, rgba(53,208,127,.18), transparent 34%),
+        linear-gradient(180deg, #0b1118 0%, var(--bg) 48%, #070a0e 100%);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { color: inherit; }
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0);
+      border: 0;
+    }
+
+    /* 3. App shell */
+    .app {
+      width: min(100%, var(--max-width));
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding: max(18px, env(safe-area-inset-top)) 16px max(22px, env(safe-area-inset-bottom));
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 10px 0 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      display: grid; place-items: center;
+      background: linear-gradient(145deg, #2a3340, #101820);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 14px 34px rgba(0,0,0,.24);
+      color: var(--accent);
+      font-weight: 850;
+      letter-spacing: -.04em;
+    }
+    .brand-title { margin: 0; font-size: 22px; line-height: 1; letter-spacing: -.04em; }
+    .brand-subtitle { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .version-pill {
+      flex: 0 0 auto;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    main { display: block; }
+    .page { display: none; animation: fadeIn .18s ease-out; }
+    .page.is-active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    /* 4. Componenten */
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018)), var(--card);
+      box-shadow: var(--shadow);
+    }
+    .panel { padding: 16px; }
+    .section-title {
+      margin: 22px 2px 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .nav-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .nav-card, .list-row, .primary-button, .ghost-button {
+      min-height: var(--tap);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.035);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-card {
+      padding: 14px;
+      text-align: left;
+    }
+    .nav-card:active, .primary-button:active, .ghost-button:active, .list-row:active { transform: scale(.99); }
+    .nav-icon {
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      display: grid; place-items: center;
+      margin-bottom: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+    }
+    .nav-title { display: block; font-size: 16px; font-weight: 750; letter-spacing: -.02em; }
+    .nav-subtitle { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.25; }
+    .primary-button {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 16px;
+      color: #08110c;
+      font-weight: 850;
+      background: linear-gradient(180deg, #50ee98, var(--accent));
+      border: 0;
+      box-shadow: 0 16px 40px rgba(53,208,127,.22);
+    }
+    .ghost-button {
+      width: 100%;
+      padding: 13px 14px;
+      color: var(--text);
+      background: rgba(255,255,255,.035);
+    }
+    .back-button {
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 40px; padding: 0 12px;
+      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.035);
+      color: var(--muted);
+    }
+    .page-heading { margin: 0 0 6px; font-size: 28px; line-height: 1; letter-spacing: -.055em; }
+    .page-lead { margin: 0 0 18px; color: var(--muted); line-height: 1.45; }
+    .empty-note {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    /* 5. Dashboard */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .summary-card { padding: 16px; min-height: 112px; }
+    .summary-label { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+    .summary-value { font-size: 25px; font-weight: 850; letter-spacing: -.055em; }
+    .summary-hint { margin-top: 7px; color: var(--muted-2); font-size: 12px; }
+    .add-card { padding: 14px; margin-bottom: 12px; }
+
+    /* 6. Pagina's */
+    .list { display: grid; gap: 10px; }
+    .list-row {
+      width: 100%;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+    }
+    .row-main { min-width: 0; }
+    .row-title { display: block; font-weight: 750; letter-spacing: -.02em; }
+    .row-subtitle { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; }
+    .chevron { color: var(--muted-2); font-size: 20px; }
+    .tabs {
+      display: flex; gap: 8px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.035);
+      margin-bottom: 12px;
+    }
+    .tab {
+      flex: 1;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 12px;
+      font-weight: 750;
+    }
+    .tab.is-active { background: var(--accent); color: #07110b; }
+
+    /* 7. Formulieren / foundation */
+    .field-grid { display: grid; gap: 10px; }
+    .field {
+      display: grid; gap: 7px;
+    }
+    .field label { color: var(--muted); font-size: 13px; }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      padding: 13px 12px;
+      outline: none;
+    }
+    .field textarea { min-height: 88px; resize: vertical; }
+    .foundation-note {
+      border: 1px dashed rgba(255,255,255,.16);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      background: rgba(255,255,255,.025);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    code {
+      color: #d7ffe8;
+      background: rgba(53,208,127,.10);
+      border: 1px solid rgba(53,208,127,.16);
+      padding: 1px 5px;
+      border-radius: 7px;
+    }
+
+    /* 8. Grafiek placeholder */
+    .chart-card { padding: 16px; }
+    .chart-head {
+      display: flex; align-items: start; justify-content: space-between; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .chart-title { margin: 0; font-size: 18px; letter-spacing: -.03em; }
+    .chart-value { margin-top: 5px; color: var(--accent); font-size: 24px; font-weight: 850; letter-spacing: -.05em; }
+    .chart-source { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .price-actions { margin-top: 14px; display: flex; justify-content: flex-end; }
+    .small-button { min-height: 38px; padding: 9px 12px; font-size: 13px; border-radius: 14px; }
+    .chart-svg { width: 100%; height: 100%; display: block; }
+    .chart-svg path { fill: none; stroke: rgba(75, 227, 148, .9); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+    .chart-svg circle { fill: var(--accent); }
+    .price-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .price-stat { border: 1px solid var(--line); background: rgba(255,255,255,.04); border-radius: 18px; padding: 12px; }
+    .price-stat-label { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+    .price-stat-value { font-size: 16px; font-weight: 800; letter-spacing: -.03em; }
+
+    .chart-box {
+      height: 150px;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(53,208,127,.12), transparent 65%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,.055) 0 1px, transparent 1px 30px),
+        repeating-linear-gradient(90deg, rgba(255,255,255,.04) 0 1px, transparent 1px 46px);
+      position: relative;
+      overflow: hidden;
+    }
+    .chart-line {
+      position: absolute;
+      inset: 22px 16px 22px 16px;
+      border-bottom: 3px solid var(--accent);
+      border-radius: 50%;
+      transform: rotate(-7deg) skewX(-14deg);
+      filter: drop-shadow(0 0 12px rgba(53,208,127,.45));
+    }
+    .chart-meta {
+      display: flex; justify-content: space-between; gap: 10px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+
+
+    .item-card {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.035);
+    }
+    .item-card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .item-title { font-weight: 800; letter-spacing: -.02em; }
+    .item-meta { margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .item-values {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .mini-stat {
+      border-radius: 14px;
+      background: rgba(0,0,0,.16);
+      border: 1px solid rgba(255,255,255,.055);
+      padding: 10px;
+    }
+    .mini-label { display:block; color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+    .mini-value { display:block; font-weight: 800; }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      transform: translate(-50%, 18px);
+      width: min(calc(100% - 32px), var(--max-width));
+      padding: 13px 14px;
+      border-radius: 18px;
+      background: rgba(20,27,35,.96);
+      border: 1px solid var(--line);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 30;
+    }
+    .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+
+
+
+    .collection-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .collection-summary-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.035);
+      padding: 13px;
+    }
+    .collection-summary-label { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+    .collection-summary-value { font-weight: 850; font-size: 20px; letter-spacing: -.04em; }
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+
+    /* 9. Analyse */
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .analysis-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.035);
+      padding: 14px;
+      min-height: 92px;
+    }
+    .analysis-label { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    .analysis-value { font-weight: 900; font-size: 22px; letter-spacing: -.05em; }
+    .analysis-note { margin-top: 6px; color: var(--muted-2); font-size: 12px; line-height: 1.35; }
+    .bar-list { display: grid; gap: 12px; }
+    .bar-row { display: grid; gap: 7px; }
+    .bar-head { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
+    .bar-track { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.06); }
+    .bar-fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), #9af4c2); }
+    .insight-list { display: grid; gap: 8px; }
+    .insight-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.14);
+      border: 1px solid rgba(255,255,255,.055);
+      font-size: 13px;
+    }
+    .insight-row span:first-child { color: var(--muted); }
+    .insight-row strong { text-align: right; }
+    .positive { color: var(--accent); }
+    .negative { color: var(--danger); }
+
+    /* 10. Responsiviteit */
+    @media (max-width: 360px) {
+      .summary-value { font-size: 22px; }
+      .nav-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar" aria-label="App kop">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">C</div>
+        <div>
+          <h1 class="brand-title">Collectie</h1>
+          <p class="brand-subtitle">Collectieoverzicht</p>
+        </div>
+      </div>
+      <div class="version-pill">v0.1.0-dev5</div>
+    </header>
+
+    <main>
+      <!-- Dashboard -->
+      <section class="page is-active" data-page="dashboard" aria-labelledby="dashboard-title">
+        <h2 id="dashboard-title" class="sr-only">Dashboard</h2>
+
+        <div class="summary-grid">
+          <article class="card summary-card">
+            <div class="summary-label">Totaal betaald</div>
+            <div class="summary-value" data-bind="totalPaid">€ 0</div>
+            <div class="summary-hint">Alle collecties</div>
+          </article>
+          <article class="card summary-card">
+            <div class="summary-label">Totale verzamelwaarde</div>
+            <div class="summary-value" data-bind="totalCollectorValue">€ 0</div>
+            <div class="summary-hint">Handmatig ingevuld</div>
+          </article>
+        </div>
+
+        <div class="card add-card">
+          <button class="primary-button" type="button" data-action="go" data-target="add-item">
+            <span aria-hidden="true">＋</span>
+            <span>Item toevoegen</span>
+          </button>
+        </div>
+
+        <div class="nav-grid" aria-label="Hoofdnavigatie">
+          <button class="nav-card" type="button" data-action="go" data-target="collection">
+            <span class="nav-icon">◎</span>
+            <span class="nav-title">Collectie</span>
+            <span class="nav-subtitle">Kies Goud & Zilver, horloges, LP’s of curiosa</span>
+          </button>
+          <button class="nav-card" type="button" data-action="go" data-target="prices">
+            <span class="nav-icon">↗</span>
+            <span class="nav-title">Koersen</span>
+            <span class="nav-subtitle">Voorbereid op goud- en zilverkoersen</span>
+          </button>
+          <button class="nav-card" type="button" data-action="go" data-target="analysis">
+            <span class="nav-icon">∑</span>
+            <span class="nav-title">Analyse</span>
+            <span class="nav-subtitle">Statistieken en inzichten komen later</span>
+          </button>
+          <button class="nav-card" type="button" data-action="go" data-target="settings">
+            <span class="nav-icon">⚙</span>
+            <span class="nav-title">Instellingen</span>
+            <span class="nav-subtitle">Collecties, herkomst, back-up en structuur</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Item toevoegen -->
+      <section class="page" data-page="add-item" aria-labelledby="add-title">
+        <button class="back-button" type="button" data-action="go" data-target="dashboard">← Dashboard</button>
+        <h2 id="add-title" class="page-heading">Item toevoegen</h2>
+        <p class="page-lead">In deze dev2 kun je items toevoegen en lokaal op je apparaat opslaan. De data blijft in deze browser staan via localStorage.</p>
+
+        <div class="card panel">
+          <div class="field-grid">
+            <div class="field">
+              <label for="collectionSelect">Collectie</label>
+              <select id="collectionSelect" data-role="collection-select"></select>
+            </div>
+            <div id="dynamicFields" class="field-grid" aria-live="polite"></div>
+            <div class="field">
+              <label for="purchasePrice">Koopprijs</label>
+              <input id="purchasePrice" inputmode="decimal" placeholder="Bijvoorbeeld 25,00">
+            </div>
+            <div class="field">
+              <label for="collectorValue">Verzamelwaarde</label>
+              <input id="collectorValue" inputmode="decimal" placeholder="Bijvoorbeeld 40,00">
+            </div>
+            <div class="field">
+              <label for="note">Opmerking</label>
+              <textarea id="note" placeholder="Vrije notitie"></textarea>
+            </div>
+            <button class="primary-button" type="button" data-action="save-item">Item opslaan</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Collectie -->
+      <section class="page" data-page="collection" aria-labelledby="collection-title">
+        <button class="back-button" type="button" data-action="go" data-target="dashboard">← Dashboard</button>
+        <h2 id="collection-title" class="page-heading">Collectie</h2>
+        <p class="page-lead">Kies een collectie om de bijbehorende items, totalen en waardes te bekijken.</p>
+        <div class="list" data-bind="collectionsList"></div>
+
+        <h3 class="section-title">Alle opgeslagen items</h3>
+        <div class="list" data-bind="itemsList"></div>
+      </section>
+
+      <!-- Collectie detail -->
+      <section class="page" data-page="collection-detail" aria-labelledby="collection-detail-title">
+        <button class="back-button" type="button" data-action="go" data-target="collection">← Collectie</button>
+        <div class="filter-pill" data-bind="collectionDetailType">Collectie</div>
+        <h2 id="collection-detail-title" class="page-heading" data-bind="collectionDetailTitle">Collectie</h2>
+        <p class="page-lead" data-bind="collectionDetailDescription">Items binnen deze collectie.</p>
+
+        <div class="collection-summary-grid">
+          <div class="collection-summary-card">
+            <div class="collection-summary-label">Aantal items</div>
+            <div class="collection-summary-value" data-bind="collectionDetailCount">0</div>
+          </div>
+          <div class="collection-summary-card">
+            <div class="collection-summary-label">Verzamelwaarde</div>
+            <div class="collection-summary-value" data-bind="collectionDetailValue">€ 0</div>
+          </div>
+        </div>
+
+        <div class="collection-summary-grid">
+          <div class="collection-summary-card">
+            <div class="collection-summary-label">Totaal betaald</div>
+            <div class="collection-summary-value" data-bind="collectionDetailPaid">€ 0</div>
+          </div>
+          <div class="collection-summary-card">
+            <div class="collection-summary-label">Resultaat</div>
+            <div class="collection-summary-value" data-bind="collectionDetailResult">€ 0</div>
+          </div>
+        </div>
+
+        <h3 class="section-title">Items in deze collectie</h3>
+        <div class="list" data-bind="collectionDetailItems"></div>
+      </section>
+
+      <!-- Koersen -->
+      <section class="page" data-page="prices" aria-labelledby="prices-title">
+        <button class="back-button" type="button" data-action="go" data-target="dashboard">← Dashboard</button>
+        <h2 id="prices-title" class="page-heading">Koersen</h2>
+        <p class="page-lead">Dagelijkse goud- en zilverkoersen zonder API-key. De app haalt slotkoersen op via Stooq, rekent USD per troy ounce om naar euro per gram en bewaart de laatst bekende koers lokaal.</p>
+
+        <div class="tabs" role="tablist" aria-label="Metaalsoort">
+          <button class="tab is-active" type="button" data-action="metal-tab" data-metal="silver">Zilver</button>
+          <button class="tab" type="button" data-action="metal-tab" data-metal="gold">Goud</button>
+        </div>
+
+        <article class="card chart-card">
+          <div class="chart-head">
+            <div>
+              <h3 class="chart-title" data-bind="metalName">Zilver</h3>
+              <div class="chart-value" data-bind="metalPrice">€ 0,92/g</div>
+            </div>
+            <div class="version-pill" data-bind="priceStatus">Laden</div>
+          </div>
+          <div class="chart-source" data-bind="priceSource">Bron: nog niet geladen</div>
+          <div class="price-actions">
+            <button class="ghost-button small-button" type="button" data-action="refresh-prices">Koersen verversen</button>
+          </div>
+          <div class="chart-box" aria-hidden="true" data-bind="priceChart"><div class="chart-line"></div></div>
+          <div class="chart-meta"><span>USD/oz</span><span>EUR/g</span><span data-bind="priceUpdated">Nog niet bijgewerkt</span></div>
+          <div class="price-stats">
+            <div class="price-stat"><div class="price-stat-label">Per troy ounce</div><div class="price-stat-value" data-bind="metalUsdOz">$ 0,00</div></div>
+            <div class="price-stat"><div class="price-stat-label">Wisselkoers</div><div class="price-stat-value" data-bind="metalFxRate">USD→EUR</div></div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Analyse -->
+      <section class="page" data-page="analysis" aria-labelledby="analysis-title">
+        <button class="back-button" type="button" data-action="go" data-target="dashboard">← Dashboard</button>
+        <h2 id="analysis-title" class="page-heading">Analyse</h2>
+        <p class="page-lead">Een eerste analyse-laag over je volledige collectie. Bewust compact, maar voorbereid op uitgebreidere statistieken.</p>
+
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <div class="analysis-label">Totaal betaald</div>
+            <div class="analysis-value" data-bind="analysisPaid">€ 0</div>
+            <div class="analysis-note">Alle ingevoerde koopprijzen samen.</div>
+          </div>
+          <div class="analysis-card">
+            <div class="analysis-label">Verzamelwaarde</div>
+            <div class="analysis-value" data-bind="analysisValue">€ 0</div>
+            <div class="analysis-note">Huidige geschatte waarde.</div>
+          </div>
+        </div>
+
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <div class="analysis-label">Resultaat</div>
+            <div class="analysis-value" data-bind="analysisResult">€ 0</div>
+            <div class="analysis-note" data-bind="analysisResultNote">Nog geen resultaat.</div>
+          </div>
+          <div class="analysis-card">
+            <div class="analysis-label">Items</div>
+            <div class="analysis-value" data-bind="analysisCount">0</div>
+            <div class="analysis-note" data-bind="analysisAverage">Gemiddelde waarde: € 0</div>
+          </div>
+        </div>
+
+        <h3 class="section-title">Verdeling per collectie</h3>
+        <div class="card panel">
+          <div class="bar-list" data-bind="analysisCollectionBars"></div>
+        </div>
+
+        <h3 class="section-title">Herkomst</h3>
+        <div class="card panel">
+          <div class="bar-list" data-bind="analysisOriginBars"></div>
+        </div>
+
+        <h3 class="section-title">Goud & Zilver</h3>
+        <div class="card panel">
+          <div class="insight-list" data-bind="analysisMetalInsights"></div>
+        </div>
+      </section>
+
+      <!-- Instellingen -->
+      <section class="page" data-page="settings" aria-labelledby="settings-title">
+        <button class="back-button" type="button" data-action="go" data-target="dashboard">← Dashboard</button>
+        <h2 id="settings-title" class="page-heading">Instellingen</h2>
+        <p class="page-lead">Hier komt alles wat instelbaar is. Dev5 voegt live goud- en zilverkoersen toe.</p>
+        <div class="list">
+          <button class="list-row" type="button"><span class="row-main"><span class="row-title">Collecties beheren</span><span class="row-subtitle">Nieuwe collectie-soorten later toevoegen</span></span><span class="chevron">›</span></button>
+          <button class="list-row" type="button"><span class="row-main"><span class="row-title">Herkomsten beheren</span><span class="row-subtitle">Bronnen zoals kringloop, familie, Marktplaats</span></span><span class="chevron">›</span></button>
+          <button class="list-row" type="button"><span class="row-main"><span class="row-title">Back-up & export</span><span class="row-subtitle">Voorbereid op lokale back-up</span></span><span class="chevron">›</span></button>
+          <button class="list-row" type="button"><span class="row-main"><span class="row-title">App-info</span><span class="row-subtitle">Collectie v0.1.0-dev5</span></span><span class="chevron">›</span></button>
+        </div>
+        <p class="foundation-note" style="margin-top:14px;">Architectuurkeuze: één <code>index.html</code> voor GitHub Pages/iPhone, met CSS en JavaScript strikt gescheiden in duidelijke blokken.</p>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /***************************************************************
+     COLLECTIE APP — v0.1.0-dev5
+     JAVASCRIPT-INHOUDSOPGAVE
+     1. App-configuratie
+     2. Database foundation
+     3. Storage/localStorage
+     4. Utilities
+     5. Navigatie/UI
+     6. Collecties
+     7. Item toevoegen en opslaan
+     8. Koersen foundation
+     9. Dashboard
+     10. Analyse
+     11. Collectie-detail
+     12. App start
+     ***************************************************************/
+
+    /* 1. App-configuratie */
+    const App = {
+      version: '0.1.0-dev5',
+      storageKey: 'collectie-app-database-v1',
+      state: {
+        activePage: 'dashboard',
+        activeMetal: 'silver',
+        activeCollectionId: 'precious-metals'
+      },
+      database: null,
+      els: {}
+    };
+
+    /* 2. Database foundation */
+    const DefaultDatabase = {
+      schemaVersion: 1,
+      appVersion: '0.1.0-dev5',
+      settings: {
+        currency: 'EUR',
+        defaultCollectionId: 'precious-metals'
+      },
+      origins: [
+        { id: 'unknown', name: 'Onbekend' },
+        { id: 'family', name: 'Familie' },
+        { id: 'thrift', name: 'Kringloop' },
+        { id: 'marketplace', name: 'Marktplaats' }
+      ],
+      collections: [
+        {
+          id: 'precious-metals',
+          name: 'Goud & Zilver',
+          description: 'Edelmetaal, munten en objecten met goud- of zilverwaarde.',
+          fields: [
+            { id: 'metal', label: 'Metaal', type: 'select', options: ['Zilver', 'Goud'] },
+            { id: 'grams', label: 'Gram totaal', type: 'number', placeholder: 'Bijvoorbeeld 125,5' },
+            { id: 'purity', label: 'Gehalte', type: 'number', placeholder: 'Bijvoorbeeld 0,925' },
+            { id: 'origin', label: 'Herkomst', type: 'origin' }
+          ]
+        },
+        {
+          id: 'watches',
+          name: 'Horloges',
+          description: 'Voorbereid op merk, model, kaliber en staat.',
+          fields: [
+            { id: 'brand', label: 'Merk', type: 'text', placeholder: 'Bijvoorbeeld Omega' },
+            { id: 'model', label: 'Model', type: 'text', placeholder: 'Bijvoorbeeld Seamaster' },
+            { id: 'caliber', label: 'Kaliber', type: 'text', placeholder: 'Bijvoorbeeld 1010' },
+            { id: 'origin', label: 'Herkomst', type: 'origin' }
+          ]
+        },
+        {
+          id: 'vinyl',
+          name: 'LP’s',
+          description: 'Voorbereid op artiest, titel, persing en staat.',
+          fields: [
+            { id: 'artist', label: 'Artiest', type: 'text', placeholder: 'Bijvoorbeeld Kraftwerk' },
+            { id: 'album', label: 'Album', type: 'text', placeholder: 'Titel' },
+            { id: 'pressing', label: 'Persing / type', type: 'text', placeholder: 'Bijvoorbeeld eerste persing' },
+            { id: 'origin', label: 'Herkomst', type: 'origin' }
+          ]
+        },
+        {
+          id: 'curiosa',
+          name: 'Curiosa',
+          description: 'Vrije categorie voor bijzondere objecten.',
+          fields: [
+            { id: 'title', label: 'Titel', type: 'text', placeholder: 'Naam of korte omschrijving' },
+            { id: 'category', label: 'Soort', type: 'text', placeholder: 'Bijvoorbeeld vaas, muntrol, sieraad' },
+            { id: 'origin', label: 'Herkomst', type: 'origin' }
+          ]
+        }
+      ],
+      items: [],
+      prices: {
+        silver: { name: 'Zilver', valuePerGram: 0.92, currency: 'EUR', usdPerOz: null, usdToEur: null, updatedAt: null, source: 'fallbackwaarde', history: [] },
+        gold: { name: 'Goud', valuePerGram: 69.50, currency: 'EUR', usdPerOz: null, usdToEur: null, updatedAt: null, source: 'fallbackwaarde', history: [] }
+      }
+    };
+
+    /* 3. Storage/localStorage */
+    const Storage = {
+      load() {
+        try {
+          const raw = localStorage.getItem(App.storageKey);
+          if (!raw) return Utils.clone(DefaultDatabase);
+          const parsed = JSON.parse(raw);
+          return Storage.migrate(parsed);
+        } catch (error) {
+          console.warn('Database laden mislukt. Standaarddatabase wordt gebruikt.', error);
+          return Utils.clone(DefaultDatabase);
+        }
+      },
+      save() {
+        App.database.appVersion = App.version;
+        localStorage.setItem(App.storageKey, JSON.stringify(App.database));
+      },
+      migrate(database) {
+        const fresh = Utils.clone(DefaultDatabase);
+        return {
+          ...fresh,
+          ...database,
+          settings: { ...fresh.settings, ...(database.settings || {}) },
+          origins: Array.isArray(database.origins) ? database.origins : fresh.origins,
+          collections: Array.isArray(database.collections) ? database.collections : fresh.collections,
+          items: Array.isArray(database.items) ? database.items : [],
+          prices: { ...fresh.prices, ...(database.prices || {}) }
+        };
+      }
+    };
+
+    /* 4. Utilities */
+    const Utils = {
+      clone(value) {
+        return JSON.parse(JSON.stringify(value));
+      },
+      uid(prefix = 'id') {
+        return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+      },
+      escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>'"]/g, char => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
+        }[char]));
+      },
+      parseNumber(value) {
+        if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+        const normalised = String(value || '').trim().replace(/\./g, '').replace(',', '.');
+        const number = Number(normalised);
+        return Number.isFinite(number) ? number : 0;
+      },
+      formatCurrency(value) {
+        return new Intl.NumberFormat('nl-NL', {
+          style: 'currency',
+          currency: 'EUR',
+          maximumFractionDigits: 0
+        }).format(value || 0);
+      },
+      formatPricePerGram(value) {
+        return new Intl.NumberFormat('nl-NL', {
+          style: 'currency',
+          currency: 'EUR',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(value || 0) + '/g';
+      },
+      formatUsdPerOz(value) {
+        if (!value) return '$ 0,00/oz';
+        return new Intl.NumberFormat('nl-NL', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(value) + '/oz';
+      },
+      formatDate(iso) {
+        return new Intl.DateTimeFormat('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(iso));
+      }
+    };
+
+    /* 5. Navigatie/UI */
+    const UI = {
+      init() {
+        App.els.pages = Array.from(document.querySelectorAll('.page'));
+        App.els.toast = document.getElementById('toast');
+        document.addEventListener('click', UI.handleClick);
+      },
+      handleClick(event) {
+        const actionEl = event.target.closest('[data-action]');
+        if (!actionEl) return;
+
+        const action = actionEl.dataset.action;
+        if (action === 'go') UI.go(actionEl.dataset.target);
+        if (action === 'open-collection') Collections.openDetail(actionEl.dataset.collectionId);
+        if (action === 'metal-tab') Prices.setActiveMetal(actionEl.dataset.metal);
+        if (action === 'refresh-prices') Prices.refreshLivePrices(true);
+        if (action === 'save-item') AddItem.save();
+      },
+      go(pageName) {
+        App.state.activePage = pageName;
+        App.els.pages.forEach(page => {
+          page.classList.toggle('is-active', page.dataset.page === pageName);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+      toast(message) {
+        if (!App.els.toast) return;
+        App.els.toast.textContent = message;
+        App.els.toast.classList.add('is-visible');
+        clearTimeout(UI.toastTimer);
+        UI.toastTimer = setTimeout(() => App.els.toast.classList.remove('is-visible'), 2400);
+      }
+    };
+
+    /* 6. Collecties */
+    const Collections = {
+      renderList() {
+        const target = document.querySelector('[data-bind="collectionsList"]');
+        target.innerHTML = App.database.collections.map(collection => {
+          const items = Collections.itemsFor(collection.id);
+          const value = items.reduce((sum, item) => sum + (Number(item.collectorValue) || 0), 0);
+          return `
+            <button class="list-row" type="button" data-action="open-collection" data-collection-id="${Utils.escapeHTML(collection.id)}">
+              <span class="row-main">
+                <span class="row-title">${Utils.escapeHTML(collection.name)}</span>
+                <span class="row-subtitle">${items.length} item${items.length === 1 ? '' : 's'} · ${Utils.formatCurrency(value)} verzamelwaarde</span>
+              </span>
+              <span class="chevron">›</span>
+            </button>
+          `;
+        }).join('');
+      },
+      renderItems() {
+        const target = document.querySelector('[data-bind="itemsList"]');
+        if (!target) return;
+        if (!App.database.items.length) {
+          target.innerHTML = '<div class="card panel"><p class="empty-note">Nog geen items opgeslagen. Voeg je eerste item toe via het dashboard.</p></div>';
+          return;
+        }
+
+        const items = [...App.database.items].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        target.innerHTML = items.map(item => Collections.itemTemplate(item)).join('');
+      },
+      openDetail(collectionId) {
+        App.state.activeCollectionId = collectionId;
+        Collections.renderDetail();
+        UI.go('collection-detail');
+      },
+      renderDetail() {
+        const collection = Collections.getById(App.state.activeCollectionId) || App.database.collections[0];
+        const target = document.querySelector('[data-bind="collectionDetailItems"]');
+        if (!collection || !target) return;
+
+        const items = Collections.itemsFor(collection.id).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const totalPaid = items.reduce((sum, item) => sum + (Number(item.purchasePrice) || 0), 0);
+        const totalValue = items.reduce((sum, item) => sum + (Number(item.collectorValue) || 0), 0);
+        const result = totalValue - totalPaid;
+
+        document.querySelector('[data-bind="collectionDetailTitle"]').textContent = collection.name;
+        document.querySelector('[data-bind="collectionDetailDescription"]').textContent = collection.description || 'Items binnen deze collectie.';
+        document.querySelector('[data-bind="collectionDetailType"]').textContent = 'Collectieoverzicht';
+        document.querySelector('[data-bind="collectionDetailCount"]').textContent = String(items.length);
+        document.querySelector('[data-bind="collectionDetailValue"]').textContent = Utils.formatCurrency(totalValue);
+        document.querySelector('[data-bind="collectionDetailPaid"]').textContent = Utils.formatCurrency(totalPaid);
+        document.querySelector('[data-bind="collectionDetailResult"]').textContent = Utils.formatCurrency(result);
+
+        if (!items.length) {
+          target.innerHTML = '<div class="card panel"><p class="empty-note">Nog geen items in deze collectie. Voeg een item toe en kies deze collectie.</p></div>';
+          return;
+        }
+        target.innerHTML = items.map(item => Collections.itemTemplate(item)).join('');
+      },
+      itemTemplate(item) {
+        const collection = Collections.getById(item.collectionId);
+        const title = Collections.itemTitle(item, collection);
+        const originName = Collections.originName(item.data.origin);
+        return `
+          <article class="item-card">
+            <div class="item-card-head">
+              <div>
+                <div class="item-title">${Utils.escapeHTML(title)}</div>
+                <div class="item-meta">${Utils.escapeHTML(collection?.name || 'Collectie')} · ${Utils.escapeHTML(originName)} · ${Utils.formatDate(item.createdAt)}</div>
+              </div>
+              <div class="version-pill">${Utils.escapeHTML(collection?.name?.slice(0, 2) || 'C')}</div>
+            </div>
+            <div class="item-values">
+              <span class="mini-stat"><span class="mini-label">Betaald</span><span class="mini-value">${Utils.formatCurrency(item.purchasePrice)}</span></span>
+              <span class="mini-stat"><span class="mini-label">Verzamelwaarde</span><span class="mini-value">${Utils.formatCurrency(item.collectorValue)}</span></span>
+            </div>
+          </article>
+        `;
+      },
+      itemTitle(item, collection) {
+        if (item.data.title) return item.data.title;
+        if (item.data.artist || item.data.album) return [item.data.artist, item.data.album].filter(Boolean).join(' — ');
+        if (item.data.brand || item.data.model) return [item.data.brand, item.data.model].filter(Boolean).join(' ');
+        if (item.data.metal) return `${item.data.metal}${item.data.grams ? ` · ${item.data.grams}g` : ''}${item.data.purity ? ` · ${item.data.purity}` : ''}`;
+        return collection?.name || 'Item';
+      },
+      originName(originId) {
+        return App.database.origins.find(origin => origin.id === originId)?.name || 'Onbekend';
+      },
+      itemsFor(collectionId) {
+        return App.database.items.filter(item => item.collectionId === collectionId);
+      },
+      getById(id) {
+        return App.database.collections.find(collection => collection.id === id);
+      }
+    };
+
+    /* 7. Item toevoegen en opslaan */
+    const AddItem = {
+      init() {
+        const select = document.querySelector('[data-role="collection-select"]');
+        select.innerHTML = App.database.collections.map(collection => `
+          <option value="${Utils.escapeHTML(collection.id)}">${Utils.escapeHTML(collection.name)}</option>
+        `).join('');
+        select.value = App.database.settings.defaultCollectionId;
+        select.addEventListener('change', AddItem.renderDynamicFields);
+        AddItem.renderDynamicFields();
+      },
+      renderDynamicFields() {
+        const select = document.querySelector('[data-role="collection-select"]');
+        const target = document.getElementById('dynamicFields');
+        const collection = Collections.getById(select.value);
+        if (!collection) return;
+
+        target.innerHTML = collection.fields.map(field => AddItem.fieldTemplate(field)).join('');
+      },
+      fieldTemplate(field) {
+        if (field.type === 'select') {
+          return `
+            <div class="field">
+              <label for="field-${Utils.escapeHTML(field.id)}">${Utils.escapeHTML(field.label)}</label>
+              <select id="field-${Utils.escapeHTML(field.id)}" data-field-id="${Utils.escapeHTML(field.id)}" data-field-type="${Utils.escapeHTML(field.type)}">
+                ${field.options.map(option => `<option>${Utils.escapeHTML(option)}</option>`).join('')}
+              </select>
+            </div>`;
+        }
+        if (field.type === 'origin') {
+          return `
+            <div class="field">
+              <label for="field-${Utils.escapeHTML(field.id)}">${Utils.escapeHTML(field.label)}</label>
+              <select id="field-${Utils.escapeHTML(field.id)}" data-field-id="${Utils.escapeHTML(field.id)}" data-field-type="${Utils.escapeHTML(field.type)}">
+                ${App.database.origins.map(origin => `<option value="${Utils.escapeHTML(origin.id)}">${Utils.escapeHTML(origin.name)}</option>`).join('')}
+              </select>
+            </div>`;
+        }
+        return `
+          <div class="field">
+            <label for="field-${Utils.escapeHTML(field.id)}">${Utils.escapeHTML(field.label)}</label>
+            <input id="field-${Utils.escapeHTML(field.id)}" data-field-id="${Utils.escapeHTML(field.id)}" data-field-type="${Utils.escapeHTML(field.type)}" inputmode="${field.type === 'number' ? 'decimal' : 'text'}" placeholder="${Utils.escapeHTML(field.placeholder || '')}">
+          </div>`;
+      },
+      save() {
+        const collectionId = document.querySelector('[data-role="collection-select"]').value;
+        const collection = Collections.getById(collectionId);
+        if (!collection) {
+          UI.toast('Kies eerst een collectie.');
+          return;
+        }
+
+        const data = {};
+        collection.fields.forEach(field => {
+          const input = document.querySelector(`[data-field-id="${field.id}"]`);
+          const raw = input ? input.value : '';
+          data[field.id] = field.type === 'number' ? Utils.parseNumber(raw) : raw.trim();
+        });
+
+        const item = {
+          id: Utils.uid('item'),
+          collectionId,
+          data,
+          purchasePrice: Utils.parseNumber(document.getElementById('purchasePrice').value),
+          collectorValue: Utils.parseNumber(document.getElementById('collectorValue').value),
+          note: document.getElementById('note').value.trim(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          attachments: [],
+          photos: []
+        };
+
+        App.database.items.push(item);
+        Storage.save();
+        AddItem.clearForm();
+        App.render();
+        UI.toast('Item opgeslagen.');
+        UI.go('collection');
+      },
+      clearForm() {
+        document.querySelectorAll('#dynamicFields input, #dynamicFields select').forEach(input => {
+          if (input.tagName === 'SELECT') input.selectedIndex = 0;
+          else input.value = '';
+        });
+        document.getElementById('purchasePrice').value = '';
+        document.getElementById('collectorValue').value = '';
+        document.getElementById('note').value = '';
+      }
+    };
+
+    /* 8. Dagelijkse goud- en zilverkoersen zonder API-key */
+    const Prices = {
+      troyOunceGrams: 31.1034768,
+      // Stooq levert openbare dag-/slotkoersen in USD per troy ounce.
+      // Frankfurter levert gratis USD→EUR wisselkoersdata.
+      stooqLatestUrl(symbol) {
+        return `https://stooq.com/q/l/?s=${symbol}&f=sd2t2ohlcv&h&e=csv`;
+      },
+      stooqHistoryUrl(symbol) {
+        return `https://stooq.com/q/d/l/?s=${symbol}&i=d`;
+      },
+      fxUrl: 'https://api.frankfurter.app/latest?from=USD&to=EUR',
+      corsProxy(url) {
+        return `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+      },
+
+      init() {
+        Prices.normalisePriceDatabase();
+        Prices.render();
+        Prices.refreshLivePrices(false);
+      },
+
+      normalisePriceDatabase() {
+        App.database.prices = App.database.prices || Utils.clone(DefaultDatabase.prices);
+        ['silver', 'gold'].forEach(key => {
+          App.database.prices[key] = {
+            ...DefaultDatabase.prices[key],
+            ...(App.database.prices[key] || {})
+          };
+        });
+        App.database.prices.meta = App.database.prices.meta || {
+          source: 'Stooq + Frankfurter',
+          updatedAt: null,
+          usdToEur: null,
+          lastAttemptAt: null
+        };
+      },
+
+      setActiveMetal(metal) {
+        App.state.activeMetal = metal;
+        document.querySelectorAll('[data-action="metal-tab"]').forEach(tab => {
+          tab.classList.toggle('is-active', tab.dataset.metal === metal);
+        });
+        Prices.render();
+      },
+
+      shouldRefreshToday() {
+        const meta = App.database.prices?.meta;
+        if (!meta?.updatedAt) return true;
+        return Prices.dateKey(meta.updatedAt) !== Prices.dateKey(new Date().toISOString());
+      },
+
+      dateKey(value) {
+        try {
+          return new Date(value).toISOString().slice(0, 10);
+        } catch {
+          return '';
+        }
+      },
+
+      async refreshLivePrices(showToast) {
+        Prices.normalisePriceDatabase();
+        if (!showToast && !Prices.shouldRefreshToday()) {
+          Prices.setStatus('Vandaag bijgewerkt');
+          Prices.render();
+          return;
+        }
+
+        Prices.setStatus('Laden');
+        App.database.prices.meta.lastAttemptAt = new Date().toISOString();
+
+        try {
+          const [gold, silver, fx] = await Promise.all([
+            Prices.fetchStooqLatest('xauusd'),
+            Prices.fetchStooqLatest('xagusd'),
+            Prices.fetchFxRate()
+          ]);
+
+          Prices.applyLivePrice('gold', gold, fx);
+          Prices.applyLivePrice('silver', silver, fx);
+
+          App.database.prices.meta = {
+            source: 'Stooq + Frankfurter',
+            updatedAt: new Date().toISOString(),
+            usdToEur: fx,
+            lastAttemptAt: new Date().toISOString()
+          };
+
+          Storage.save();
+          Prices.render();
+          Analysis.render();
+          Prices.setStatus('Dagkoers');
+          if (showToast) UI.toast('Dagkoersen bijgewerkt.');
+        } catch (error) {
+          console.warn('Dagkoersen laden mislukt. Laatst bekende koersen blijven zichtbaar.', error);
+          Prices.setStatus('Offline/cache');
+          Prices.render();
+          if (showToast) UI.toast('Koersen konden niet worden geladen. Laatst bekende waarde blijft staan.');
+        }
+      },
+
+      async fetchTextWithFallback(url) {
+        const urls = [url, Prices.corsProxy(url)];
+        let lastError = null;
+        for (const candidate of urls) {
+          try {
+            const response = await fetch(candidate, { cache: 'no-store' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            const text = await response.text();
+            if (text && text.trim()) return text;
+            throw new Error('Lege reactie');
+          } catch (error) {
+            lastError = error;
+          }
+        }
+        throw lastError || new Error('Geen reactie');
+      },
+
+      async fetchStooqLatest(symbol) {
+        const csv = await Prices.fetchTextWithFallback(Prices.stooqLatestUrl(symbol));
+        const rows = Prices.parseCsv(csv);
+        if (rows.length < 2) throw new Error(`Geen Stooq-data voor ${symbol}`);
+        const header = rows[0].map(cell => cell.toLowerCase());
+        const data = rows[1];
+        const closeIndex = header.indexOf('close');
+        const dateIndex = header.indexOf('date');
+        const timeIndex = header.indexOf('time');
+        const close = Number(String(data[closeIndex] || '').replace(',', '.'));
+        if (!Number.isFinite(close) || close <= 0) throw new Error(`Geen geldige slotkoers voor ${symbol}`);
+        const date = data[dateIndex] || new Date().toISOString().slice(0, 10);
+        const time = data[timeIndex] && data[timeIndex] !== 'N/D' ? data[timeIndex] : '00:00:00';
+        return {
+          symbol,
+          usdPerOz: close,
+          updatedAt: Prices.makeIsoDate(date, time),
+          source: 'Stooq'
+        };
+      },
+
+      parseCsv(csv) {
+        return csv.trim().split(/\r?\n/).map(line => line.split(',').map(cell => cell.trim().replace(/^"|"$/g, '')));
+      },
+
+      makeIsoDate(date, time) {
+        const normalisedTime = /^\d{2}:\d{2}:\d{2}$/.test(time) ? time : '00:00:00';
+        const iso = `${date}T${normalisedTime}Z`;
+        const parsed = new Date(iso);
+        return Number.isNaN(parsed.getTime()) ? new Date().toISOString() : parsed.toISOString();
+      },
+
+      async fetchFxRate() {
+        const response = await fetch(Prices.fxUrl, { cache: 'no-store' });
+        if (!response.ok) throw new Error(`Wisselkoers API fout: ${response.status}`);
+        const data = await response.json();
+        const rate = Number(data?.rates?.EUR);
+        if (!Number.isFinite(rate) || rate <= 0) throw new Error('Geen geldige USD/EUR wisselkoers');
+        return rate;
+      },
+
+      applyLivePrice(key, metalData, usdToEur) {
+        const eurPerGram = (metalData.usdPerOz * usdToEur) / Prices.troyOunceGrams;
+        const current = App.database.prices[key] || {};
+        const history = Array.isArray(current.history) ? current.history.slice(-29) : [];
+        const lastHistoryDate = history.length ? Prices.dateKey(history[history.length - 1].at) : null;
+        const pointDate = Prices.dateKey(metalData.updatedAt);
+        if (lastHistoryDate === pointDate) {
+          history[history.length - 1] = {
+            at: metalData.updatedAt,
+            valuePerGram: eurPerGram,
+            usdPerOz: metalData.usdPerOz,
+            usdToEur
+          };
+        } else {
+          history.push({
+            at: metalData.updatedAt,
+            valuePerGram: eurPerGram,
+            usdPerOz: metalData.usdPerOz,
+            usdToEur
+          });
+        }
+        App.database.prices[key] = {
+          ...current,
+          valuePerGram: eurPerGram,
+          usdPerOz: metalData.usdPerOz,
+          usdToEur,
+          source: 'Stooq + Frankfurter',
+          updatedAt: metalData.updatedAt || new Date().toISOString(),
+          history
+        };
+      },
+
+      setStatus(status) {
+        const el = document.querySelector('[data-bind="priceStatus"]');
+        if (el) el.textContent = status;
+      },
+
+      render() {
+        Prices.normalisePriceDatabase();
+        const metal = App.database.prices[App.state.activeMetal] || App.database.prices.silver;
+        document.querySelector('[data-bind="metalName"]').textContent = metal.name;
+        document.querySelector('[data-bind="metalPrice"]').textContent = Utils.formatPricePerGram(metal.valuePerGram);
+        const usdEl = document.querySelector('[data-bind="metalUsdOz"]');
+        if (usdEl) usdEl.textContent = Utils.formatUsdPerOz(metal.usdPerOz);
+        const fxEl = document.querySelector('[data-bind="metalFxRate"]');
+        if (fxEl) fxEl.textContent = metal.usdToEur ? `1 USD = € ${Number(metal.usdToEur).toFixed(4).replace('.', ',')}` : 'Nog niet bekend';
+        const sourceEl = document.querySelector('[data-bind="priceSource"]');
+        if (sourceEl) sourceEl.textContent = Prices.getSourceText(metal);
+        const updatedEl = document.querySelector('[data-bind="priceUpdated"]');
+        if (updatedEl) updatedEl.textContent = Prices.getUpdatedText(metal);
+        const statusEl = document.querySelector('[data-bind="priceStatus"]');
+        if (statusEl && statusEl.textContent === 'Laden') statusEl.textContent = metal.updatedAt ? 'Dagkoers' : 'Fallback';
+        Prices.renderChart(metal);
+      },
+
+      getSourceText(metal) {
+        const source = metal.source || 'fallbackwaarde';
+        if (!metal.updatedAt) return `Bron: ${source}. Nog geen dagkoers geladen.`;
+        return `Bron: ${source}. Slotkoers USD/oz omgerekend naar EUR/g. Maximaal één automatische update per dag.`;
+      },
+
+      getUpdatedText(metal) {
+        if (!metal.updatedAt) return 'Nog niet bijgewerkt';
+        try {
+          return `Bijgewerkt ${new Intl.DateTimeFormat('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(metal.updatedAt))}`;
+        } catch {
+          return 'Bijgewerkt';
+        }
+      },
+
+      renderChart(metal) {
+        const box = document.querySelector('[data-bind="priceChart"]');
+        if (!box) return;
+        const history = Array.isArray(metal.history) && metal.history.length >= 2
+          ? metal.history
+          : Prices.makeFallbackHistory(metal.valuePerGram);
+        const values = history.map(point => Number(point.valuePerGram) || 0);
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const range = Math.max(max - min, 0.0001);
+        const width = 320;
+        const height = 120;
+        const pad = 14;
+        const step = (width - pad * 2) / Math.max(values.length - 1, 1);
+        const points = values.map((value, index) => {
+          const x = pad + index * step;
+          const y = height - pad - ((value - min) / range) * (height - pad * 2);
+          return [x, y];
+        });
+        const path = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point[0].toFixed(1)} ${point[1].toFixed(1)}`).join(' ');
+        const last = points[points.length - 1];
+        box.innerHTML = `<svg class="chart-svg" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-hidden="true"><path d="${path}"></path><circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="4"></circle></svg>`;
+      },
+
+      makeFallbackHistory(value) {
+        const base = Number(value) || 1;
+        return Array.from({ length: 12 }, (_, index) => ({
+          valuePerGram: base * (0.985 + Math.sin(index / 1.7) * 0.008 + index * 0.002)
+        }));
+      }
+    };
+
+    /* 9. Dashboard */
+    const Dashboard = {
+      render() {
+        const totalPaid = App.database.items.reduce((sum, item) => sum + (Number(item.purchasePrice) || 0), 0);
+        const totalCollectorValue = App.database.items.reduce((sum, item) => sum + (Number(item.collectorValue) || 0), 0);
+        document.querySelector('[data-bind="totalPaid"]').textContent = Utils.formatCurrency(totalPaid);
+        document.querySelector('[data-bind="totalCollectorValue"]').textContent = Utils.formatCurrency(totalCollectorValue);
+      }
+    };
+
+    /* 10. Analyse */
+    const Analysis = {
+      render() {
+        const items = App.database.items;
+        const totalPaid = items.reduce((sum, item) => sum + (Number(item.purchasePrice) || 0), 0);
+        const totalValue = items.reduce((sum, item) => sum + (Number(item.collectorValue) || 0), 0);
+        const result = totalValue - totalPaid;
+        const average = items.length ? totalValue / items.length : 0;
+
+        Analysis.setText('analysisPaid', Utils.formatCurrency(totalPaid));
+        Analysis.setText('analysisValue', Utils.formatCurrency(totalValue));
+        Analysis.setText('analysisResult', Utils.formatCurrency(result));
+        Analysis.setText('analysisCount', String(items.length));
+        Analysis.setText('analysisAverage', `Gemiddelde waarde: ${Utils.formatCurrency(average)}`);
+
+        const resultNote = totalPaid > 0
+          ? `${result >= 0 ? 'Plus' : 'Min'} ${Math.abs(result / totalPaid * 100).toFixed(1).replace('.', ',')}% ten opzichte van aankoop.`
+          : 'Voer koopprijzen in voor rendementsanalyse.';
+        Analysis.setText('analysisResultNote', resultNote);
+        const resultEl = document.querySelector('[data-bind="analysisResult"]');
+        if (resultEl) {
+          resultEl.classList.toggle('positive', result > 0);
+          resultEl.classList.toggle('negative', result < 0);
+        }
+
+        Analysis.renderCollectionBars();
+        Analysis.renderOriginBars();
+        Analysis.renderMetalInsights();
+      },
+      setText(bind, value) {
+        const el = document.querySelector(`[data-bind="${bind}"]`);
+        if (el) el.textContent = value;
+      },
+      renderCollectionBars() {
+        const target = document.querySelector('[data-bind="analysisCollectionBars"]');
+        if (!target) return;
+        const rows = App.database.collections.map(collection => {
+          const items = Collections.itemsFor(collection.id);
+          const value = items.reduce((sum, item) => sum + (Number(item.collectorValue) || 0), 0);
+          return { name: collection.name, count: items.length, value };
+        }).filter(row => row.count || row.value);
+
+        if (!rows.length) {
+          target.innerHTML = '<p class="empty-note">Nog geen verdeling beschikbaar. Voeg eerst items toe.</p>';
+          return;
+        }
+        const max = Math.max(...rows.map(row => row.value), 1);
+        target.innerHTML = rows
+          .sort((a, b) => b.value - a.value)
+          .map(row => Analysis.barTemplate(row.name, `${row.count} item${row.count === 1 ? '' : 's'} · ${Utils.formatCurrency(row.value)}`, row.value / max * 100))
+          .join('');
+      },
+      renderOriginBars() {
+        const target = document.querySelector('[data-bind="analysisOriginBars"]');
+        if (!target) return;
+        const map = new Map();
+        App.database.items.forEach(item => {
+          const name = Collections.originName(item.data.origin);
+          const current = map.get(name) || { name, count: 0, value: 0 };
+          current.count += 1;
+          current.value += Number(item.collectorValue) || 0;
+          map.set(name, current);
+        });
+        const rows = Array.from(map.values()).filter(row => row.count || row.value);
+        if (!rows.length) {
+          target.innerHTML = '<p class="empty-note">Nog geen herkomstgegevens. Voeg items met herkomst toe.</p>';
+          return;
+        }
+        const max = Math.max(...rows.map(row => row.value), 1);
+        target.innerHTML = rows
+          .sort((a, b) => b.value - a.value)
+          .map(row => Analysis.barTemplate(row.name, `${row.count} item${row.count === 1 ? '' : 's'} · ${Utils.formatCurrency(row.value)}`, row.value / max * 100))
+          .join('');
+      },
+      barTemplate(label, value, percentage) {
+        return `
+          <div class="bar-row">
+            <div class="bar-head"><span>${Utils.escapeHTML(label)}</span><strong>${Utils.escapeHTML(value)}</strong></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.max(3, Math.min(100, percentage)).toFixed(1)}%"></div></div>
+          </div>
+        `;
+      },
+      renderMetalInsights() {
+        const target = document.querySelector('[data-bind="analysisMetalInsights"]');
+        if (!target) return;
+        const metalItems = Collections.itemsFor('precious-metals');
+        if (!metalItems.length) {
+          target.innerHTML = '<p class="empty-note">Nog geen goud- of zilveritems opgeslagen.</p>';
+          return;
+        }
+
+        const totals = metalItems.reduce((acc, item) => {
+          const metal = String(item.data.metal || 'Onbekend').toLowerCase();
+          const grams = Number(item.data.grams) || 0;
+          const purity = Number(item.data.purity) || 0;
+          const fine = grams * purity;
+          if (metal.includes('goud')) acc.gold += fine;
+          else if (metal.includes('zilver')) acc.silver += fine;
+          else acc.unknown += fine;
+          acc.totalGross += grams;
+          acc.totalFine += fine;
+          return acc;
+        }, { silver: 0, gold: 0, unknown: 0, totalGross: 0, totalFine: 0 });
+
+        const estimatedMetalValue =
+          totals.silver * (App.database.prices.silver?.valuePerGram || 0) +
+          totals.gold * (App.database.prices.gold?.valuePerGram || 0);
+
+        target.innerHTML = [
+          ['Bruto gewicht', `${Analysis.formatGrams(totals.totalGross)} g`],
+          ['Fijn zilver', `${Analysis.formatGrams(totals.silver)} g`],
+          ['Fijn goud', `${Analysis.formatGrams(totals.gold)} g`],
+          ['Geschatte metaalwaarde', Utils.formatCurrency(estimatedMetalValue)]
+        ].map(([label, value]) => `<div class="insight-row"><span>${label}</span><strong>${value}</strong></div>`).join('');
+      },
+      formatGrams(value) {
+        return new Intl.NumberFormat('nl-NL', { maximumFractionDigits: 2 }).format(value || 0);
+      }
+    };
+
+    App.render = function renderApp() {
+      Collections.renderList();
+      Collections.renderItems();
+      Collections.renderDetail();
+      Prices.render();
+      Dashboard.render();
+      Analysis.render();
+    };
+
+    /* 10. App start */
+    function initApp() {
+      App.database = Storage.load();
+      UI.init();
+      AddItem.init();
+      App.render();
+      console.info('Collectie gestart:', App.version, App.database);
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
