@@ -1,0 +1,1998 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0b0f14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Collectie">
+  <title>Collectie v0.1.0-dev17</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+
+  <style>
+    /* ============================================================
+       COLLECTIE APP — v0.1.0-dev17
+       CSS-INHOUDSOPGAVE
+       1. Design tokens
+       2. Reset & basis
+       3. App shell
+       4. Componenten
+       5. Dashboard
+       6. Pagina's
+       7. Formulieren / foundation
+       8. Grafiek placeholder
+       9. Analyse
+       10. Responsiviteit
+       ============================================================ */
+
+    /* 1. Design tokens */
+    :root {
+      --bg: #090d12;
+      --bg-soft: #10161d;
+      --card: #141b23;
+      --card-2: #19222c;
+      --card-3: #1f2a36;
+      --text: #f5f7fb;
+      --muted: #9aa7b5;
+      --muted-2: #687686;
+      --line: rgba(255,255,255,.08);
+      --accent: #007AFF;
+      --accent-2: #0A84FF;
+      --accent-soft: rgba(0,122,255,.16);
+      --warning: #f2c94c;
+      --danger: #FF453A;
+      --radius-sm: 12px;
+      --radius-md: 18px;
+      --radius-lg: 28px;
+      --shadow: 0 24px 70px rgba(0,0,0,.35);
+      --max-width: 440px;
+      --tap: 48px;
+      --font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    /* 2. Reset & basis */
+    * { box-sizing: border-box; }
+    html { min-height: 100%; background: var(--bg); }
+    body {
+      min-height: 100%;
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      background:
+        radial-gradient(circle at 50% -8%, rgba(0,122,255,.18), transparent 34%),
+        linear-gradient(180deg, #0b1118 0%, var(--bg) 48%, #070a0e 100%);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    button, input, select, textarea { font: inherit; }
+    button { color: inherit; }
+    .sr-only {
+      position: absolute;
+      width: 1px; height: 1px;
+      padding: 0; margin: -1px;
+      overflow: hidden; clip: rect(0,0,0,0);
+      border: 0;
+    }
+
+    /* 3. App shell */
+    .app {
+      width: min(100%, var(--max-width));
+      min-height: 100dvh;
+      margin: 0 auto;
+      padding: max(18px, env(safe-area-inset-top)) 16px max(22px, env(safe-area-inset-bottom));
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin: 10px 0 18px;
+    }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark {
+      width: 44px; height: 44px;
+      border-radius: 14px;
+      display: grid; place-items: center;
+      background: linear-gradient(141deg, #2a3340, #101820);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 14px 34px rgba(0,0,0,.24);
+      color: var(--accent);
+      font-weight: 850;
+      letter-spacing: -.04em;
+    }
+    .brand-title { margin: 0; font-size: 22px; line-height: 1; letter-spacing: -.04em; }
+    .brand-subtitle { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+    .version-pill {
+      flex: 0 0 auto;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: 12px;
+      background: rgba(255,255,255,.03);
+    }
+    main { display: block; }
+    .page { display: none; animation: fadeIn .18s ease-out; }
+    .page.is-active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+    /* 4. Componenten */
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.018)), var(--card);
+      box-shadow: var(--shadow);
+    }
+    .panel { padding: 16px; }
+    .section-title {
+      margin: 22px 2px 10px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .nav-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .nav-card, .list-row, .primary-button, .ghost-button {
+      min-height: var(--tap);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.035);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-card {
+      padding: 14px;
+      text-align: left;
+    }
+    .nav-card:active, .primary-button:active, .ghost-button:active, .list-row:active { transform: scale(.99); }
+    .nav-icon {
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      display: grid; place-items: center;
+      margin-bottom: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+    }
+    .nav-title { display: block; font-size: 16px; font-weight: 750; letter-spacing: -.02em; }
+    .nav-subtitle { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.25; }
+
+    .secondary-button {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.055);
+      color: var(--text);
+      border-radius: 18px;
+      padding: 14px 16px;
+      font-weight: 850;
+      font-size: 15px;
+    }
+    .secondary-button[hidden] { display: none; }
+
+    .primary-button {
+      width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 14px 16px;
+      color: #fff;
+      font-weight: 850;
+      background: linear-gradient(180deg, var(--accent-2), var(--accent));
+      border: 0;
+      box-shadow: 0 16px 40px rgba(0,122,255,.26);
+    }
+    .ghost-button {
+      width: 100%;
+      padding: 13px 14px;
+      color: var(--text);
+      background: rgba(255,255,255,.035);
+    }
+    .back-button {
+      display: inline-flex; align-items: center; gap: 8px;
+      height: 40px; padding: 0 12px;
+      margin-bottom: 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.035);
+      color: var(--muted);
+    }
+    .page-heading { margin: 0 0 6px; font-size: 28px; line-height: 1; letter-spacing: -.055em; }
+    .page-lead { margin: 0 0 18px; color: var(--muted); line-height: 1.45; }
+    .empty-note {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+
+    /* 5. Dashboard */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .summary-card { padding: 16px; min-height: 112px; }
+    .summary-label { color: var(--muted); font-size: 13px; margin-bottom: 12px; }
+    .summary-value { font-size: 25px; font-weight: 850; letter-spacing: -.055em; }
+    .summary-hint { margin-top: 7px; color: var(--muted-2); font-size: 12px; }
+    .add-card { padding: 14px; margin-bottom: 12px; }
+
+    /* 6. Pagina's */
+    .list { display: grid; gap: 10px; }
+    .list-row {
+      width: 100%;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      text-align: left;
+    }
+    .row-main { min-width: 0; }
+    .row-title { display: block; font-weight: 750; letter-spacing: -.02em; }
+    .row-subtitle { display: block; margin-top: 4px; color: var(--muted); font-size: 13px; }
+    .chevron { color: var(--muted-2); font-size: 20px; }
+    .tabs {
+      display: flex; gap: 8px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.035);
+      margin-bottom: 12px;
+    }
+    .tab {
+      flex: 1;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 12px;
+      font-weight: 750;
+    }
+    .tab.is-active { background: var(--accent); color: #fff; }
+
+    /* 7. Formulieren / foundation */
+    .field-grid { display: grid; gap: 10px; }
+    .field {
+      display: grid; gap: 7px;
+    }
+    .field label { color: var(--muted); font-size: 13px; }
+    .field input, .field select, .field textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(0,0,0,.18);
+      color: var(--text);
+      padding: 13px 12px;
+      outline: none;
+    }
+    .field textarea { min-height: 88px; resize: vertical; }
+    .foundation-note {
+      border: 1px dashed rgba(255,255,255,.16);
+      border-radius: var(--radius-md);
+      padding: 14px;
+      background: rgba(255,255,255,.025);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    code {
+      color: #d7ffe8;
+      background: rgba(53,208,127,.10);
+      border: 1px solid rgba(53,208,127,.16);
+      padding: 1px 5px;
+      border-radius: 7px;
+    }
+
+    /* 8. Grafiek placeholder */
+    .chart-card { padding: 16px; }
+    .chart-head {
+      display: flex; align-items: start; justify-content: space-between; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .chart-title { margin: 0; font-size: 18px; letter-spacing: -.03em; }
+    .chart-value { margin-top: 5px; color: var(--accent); font-size: 24px; font-weight: 850; letter-spacing: -.05em; }
+    .chart-source { margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .chart-note { margin-top: 10px; color: var(--muted); font-size: 12px; line-height: 1.35; }
+    .price-actions { margin-top: 14px; display: flex; justify-content: flex-end; }
+    .small-button { min-height: 38px; padding: 9px 12px; font-size: 13px; border-radius: 14px; }
+    .chart-svg { width: 100%; height: 100%; display: block; }
+    .chart-svg path { fill: none; stroke: rgba(0,122,255,.95); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; }
+    .chart-svg circle { fill: var(--accent); }
+    .price-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+    .price-stat { border: 1px solid var(--line); background: rgba(255,255,255,.04); border-radius: 18px; padding: 12px; }
+    .price-stat-label { color: var(--muted); font-size: 12px; margin-bottom: 5px; }
+    .price-stat-value { font-size: 16px; font-weight: 800; letter-spacing: -.03em; }
+    .price-feedback {
+      margin-top: 14px;
+      border: 1px solid rgba(0,122,255,.28);
+      background: rgba(0,122,255,.10);
+      color: var(--text);
+      border-radius: 18px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .price-feedback.is-error {
+      border-color: rgba(255,93,115,.32);
+      background: rgba(255,93,115,.09);
+    }
+    .price-feedback:empty { display: none; }
+
+    .chart-box {
+      height: 170px;
+      border-radius: 18px;
+      background:
+        linear-gradient(180deg, rgba(0,122,255,.11), transparent 68%);
+      position: relative;
+      overflow: hidden;
+    }
+    .chart-line {
+      position: absolute;
+      inset: 22px 16px 22px 16px;
+      border-bottom: 3px solid var(--accent);
+      border-radius: 50%;
+      transform: rotate(-7deg) skewX(-14deg);
+      filter: drop-shadow(0 0 12px rgba(0,122,255,.38));
+    }
+    .chart-meta {
+      display: flex; justify-content: space-between; gap: 10px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .range-tabs {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin: 14px 0 10px;
+      padding: 5px;
+      border: 1px solid var(--line);
+      background: rgba(0,0,0,.13);
+      border-radius: 18px;
+    }
+    .range-tab {
+      border: 0;
+      color: var(--muted);
+      background: transparent;
+      border-radius: 13px;
+      min-height: 34px;
+      font-weight: 800;
+      font-size: 12px;
+      letter-spacing: -.02em;
+    }
+    .range-tab.is-active {
+      background: rgba(255,255,255,.13);
+      color: var(--text);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+    }
+    .chart-box svg { width: 100%; height: 100%; display: block; }
+    .chart-axis-label { fill: rgba(174,184,198,.78); font-size: 11px; font-weight: 750; }
+    .chart-axis-label.muted { fill: rgba(174,184,198,.38); }
+    .chart-axis-label.date { fill: rgba(174,184,198,.78); font-size: 10.5px; }
+    .chart-grid-line { stroke: rgba(255,255,255,.065); stroke-width: 1; }
+    .chart-grid-line.vertical { stroke: rgba(255,255,255,.045); }
+    .chart-main-line { fill: none; stroke: var(--accent); stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 8px rgba(0,122,255,.34)); }
+    .chart-main-area { fill: rgba(0,122,255,.20); }
+    .chart-last-dot { fill: var(--accent); stroke: rgba(255,255,255,.75); stroke-width: 1.2; }
+    .chart-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .chart-summary-item {
+      padding: 10px 11px;
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      background: rgba(255,255,255,.035);
+    }
+    .chart-summary-label { color: var(--muted); font-size: 11px; font-weight: 700; }
+    .chart-summary-value { margin-top: 4px; font-size: 13px; font-weight: 850; color: var(--text); }
+    .chart-summary-value.positive { color: var(--accent); }
+    .chart-summary-value.negative { color: var(--danger); }
+
+    .diagnostics-toggle { margin-top: 10px; }
+    .diagnostics-toggle summary { list-style: none; cursor: pointer; }
+    .diagnostics-toggle summary::-webkit-details-marker { display: none; }
+    .diagnostics-toggle[open] .chevron { transform: rotate(90deg); }
+    .diagnostics-content { padding: 0 14px 14px; }
+
+
+
+    .item-swipe {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-md);
+      touch-action: pan-y;
+    }
+    .item-delete-bg {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 18px;
+      background: linear-gradient(270deg, rgba(255,59,48,.95), rgba(255,59,48,.45));
+      color: white;
+      font-weight: 900;
+      letter-spacing: -.02em;
+      opacity: 0;
+      transition: opacity .18s ease;
+    }
+    .item-swipe.is-swiping .item-delete-bg { opacity: 1; }
+    .item-card {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.035);
+      text-align: left;
+      color: inherit;
+      font: inherit;
+      cursor: pointer;
+      transform: translateX(0);
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .item-card:active { background: rgba(255,255,255,.06); border-color: rgba(0,122,255,.32); }
+    .item-card-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 10px;
+    }
+    .item-title { font-weight: 800; letter-spacing: -.02em; }
+    .item-meta { margin-top: 3px; color: var(--muted); font-size: 12px; }
+    .item-values {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .mini-stat {
+      border-radius: 14px;
+      background: rgba(0,0,0,.16);
+      border: 1px solid rgba(255,255,255,.055);
+      padding: 10px;
+    }
+    .mini-label { display:block; color: var(--muted); font-size: 11px; margin-bottom: 4px; }
+    .mini-value { display:block; font-weight: 800; }
+    .mini-value.muted { color: var(--muted); }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: max(18px, env(safe-area-inset-bottom));
+      transform: translate(-50%, 18px);
+      width: min(calc(100% - 32px), var(--max-width));
+      padding: 13px 14px;
+      border-radius: 18px;
+      background: rgba(20,27,35,.96);
+      border: 1px solid var(--line);
+      color: var(--text);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .18s ease, transform .18s ease;
+      z-index: 30;
+    }
+    .toast.is-visible { opacity: 1; transform: translate(-50%, 0); }
+
+
+
+    .collection-summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .collection-summary-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.035);
+      padding: 13px;
+    }
+    .collection-summary-label { color: var(--muted); font-size: 12px; margin-bottom: 6px; }
+    .collection-summary-value { font-weight: 850; font-size: 20px; letter-spacing: -.04em; }
+    .filter-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      min-height: 34px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 800;
+      margin-bottom: 12px;
+    }
+
+
+
+    /* 8b. Koersdiagnose */
+    .diagnostics-grid { display: grid; gap: 10px; margin-top: 12px; }
+    .diagnostic-row {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: rgba(255,255,255,.035);
+      padding: 12px;
+    }
+    .diagnostic-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .diagnostic-title { font-weight: 800; letter-spacing: -.02em; }
+    .diagnostic-status {
+      flex: 0 0 auto;
+      padding: 5px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(255,255,255,.06);
+    }
+    .diagnostic-status.ok { color: #fff; background: var(--accent); }
+    .diagnostic-status.fail { color: #fff; background: rgba(255,93,115,.65); }
+    .diagnostic-detail { margin-top: 7px; color: var(--muted); font-size: 12px; line-height: 1.35; word-break: break-word; }
+    .diagnostic-log {
+      margin-top: 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(0,0,0,.18);
+      padding: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 180px;
+      overflow: auto;
+    }
+
+    /* 9. Analyse */
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .analysis-card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      background: rgba(255,255,255,.035);
+      padding: 14px;
+      min-height: 92px;
+    }
+    .analysis-label { color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+    .analysis-value { font-weight: 900; font-size: 22px; letter-spacing: -.05em; }
+    .analysis-note { margin-top: 6px; color: var(--muted-2); font-size: 12px; line-height: 1.35; }
+    .bar-list { display: grid; gap: 12px; }
+    .bar-row { display: grid; gap: 7px; }
+    .bar-head { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 12px; }
+    .bar-track { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.06); }
+    .bar-fill { height: 100%; width: 0%; border-radius: inherit; background: linear-gradient(90deg, var(--accent), #64D2FF); }
+    .insight-list { display: grid; gap: 8px; }
+    .insight-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.14);
+      border: 1px solid rgba(255,255,255,.055);
+      font-size: 13px;
+    }
+    .insight-row span:first-child { color: var(--muted); }
+    .insight-row strong { text-align: right; }
+    .positive { color: var(--accent); }
+    .negative { color: var(--danger); }
+
+    /* 10. Responsiviteit */
+    @media (max-width: 360px) {
+      .summary-value { font-size: 22px; }
+      .nav-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar" aria-label="App kop">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">C</div>
+        <div>
+          <h1 class="brand-title">Collectie</h1>
+          <p class="brand-subtitle">Collectieoverzicht</p>
+        </div>
+      </div>
+      <div class="version-pill">v0.1.0-dev17</div>
+    </header>
+
+    <main>
+      <!-- Dashboard -->
+      <section class="page is-active" data-page="dashboard" aria-labelledby="dashboard-title">
+        <h2 id="dashboard-title" class="sr-only">Dashboard</h2>
+
+        <div class="summary-grid">
+          <article class="card summary-card">
+            <div class="summary-label">Totaal betaald</div>
+            <div class="summary-value" data-bind="totalPaid">€ 0</div>
+            <div class="summary-hint">Alle collecties</div>
+          </article>
+          <article class="card summary-card">
+            <div class="summary-label">Totale verzamelwaarde</div>
+            <div class="summary-value" data-bind="totalCollectorValue">€ 0</div>
+            <div class="summary-hint">Handmatig ingevuld</div>
+          </article>
+        </div>
+
+        <div class="card add-card">
+          <button class="primary-button" type="button" data-action="go" data-target="add-item">
+            <span aria-hidden="true">＋</span>
+            <span>Item toevoegen</span>
+          </button>
+        </div>
+
+        <div class="nav-grid" aria-label="Hoofdnavigatie">
+          <button class="nav-card" type="button" data-action="go" data-target="collection">
+            <span class="nav-icon">◎</span>
+            <span class="nav-title">Collectie</span>
+            <span class="nav-subtitle">Kies Goud & Zilver, horloges, LP’s of curiosa</span>
+          </button>
+          <button class="nav-card" type="button" data-action="go" data-target="analysis">
+            <span class="nav-icon">∑</span>
+            <span class="nav-title">Analyse</span>
+            <span class="nav-subtitle">Statistieken en inzichten komen later</span>
+          </button>
+          <button class="nav-card" type="button" data-action="go" data-target="settings">
+            <span class="nav-icon">⚙</span>
+            <span class="nav-title">Instellingen</span>
+            <span class="nav-subtitle">Collecties, herkomst, back-up en structuur</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- Item toevoegen -->
+      <section class="page" data-page="add-item" aria-labelledby="add-title">
+        <button class="back-button" type="button" data-action="go" data-target="dashboard">← Dashboard</button>
+        <h2 id="add-title" class="page-heading" data-bind="addItemTitle">Item toevoegen</h2>
+        <p class="page-lead"><span data-bind="addItemLead">Voeg een item toe en sla het lokaal op in deze browser.</span></p>
+
+        <div class="card panel">
+          <div class="field-grid">
+            <div class="field">
+              <label for="collectionSelect">Collectie</label>
+              <select id="collectionSelect" data-role="collection-select"></select>
+            </div>
+            <div id="dynamicFields" class="field-grid" aria-live="polite"></div>
+            <div class="field">
+              <label for="purchasePrice">Koopprijs</label>
+              <input id="purchasePrice" inputmode="decimal" placeholder="Bijvoorbeeld 25,00">
+            </div>
+            <div class="field">
+              <label for="collectorValue">Verzamelwaarde</label>
+              <input id="collectorValue" inputmode="decimal" placeholder="Bijvoorbeeld 40,00">
+            </div>
+            <div class="field">
+              <label for="note">Opmerking</label>
+              <textarea id="note" placeholder="Vrije notitie"></textarea>
+            </div>
+            <button class="primary-button" type="button" data-action="save-item" data-bind="saveItemButton">Item opslaan</button><button class="secondary-button" type="button" data-action="cancel-edit" data-bind="cancelEditButton" hidden>Annuleer wijzigen</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Collectie -->
+      <section class="page" data-page="collection" aria-labelledby="collection-title">
+        <button class="back-button" type="button" data-action="go" data-target="dashboard">← Dashboard</button>
+        <h2 id="collection-title" class="page-heading">Collectie</h2>
+        <p class="page-lead">Kies een collectie om de bijbehorende items, totalen en waardes te bekijken.</p>
+        <div class="list" data-bind="collectionsList"></div>
+
+        <h3 class="section-title">Alle opgeslagen items</h3>
+        <div class="list" data-bind="itemsList"></div>
+      </section>
+
+      <!-- Collectie detail -->
+      <section class="page" data-page="collection-detail" aria-labelledby="collection-detail-title">
+        <button class="back-button" type="button" data-action="go" data-target="collection">← Collectie</button>
+        <div class="filter-pill" data-bind="collectionDetailType">Collectie</div>
+        <h2 id="collection-detail-title" class="page-heading" data-bind="collectionDetailTitle">Collectie</h2>
+        <p class="page-lead" data-bind="collectionDetailDescription">Items binnen deze collectie.</p>
+
+        <div class="collection-summary-grid">
+          <div class="collection-summary-card">
+            <div class="collection-summary-label">Aantal items</div>
+            <div class="collection-summary-value" data-bind="collectionDetailCount">0</div>
+          </div>
+          <div class="collection-summary-card">
+            <div class="collection-summary-label">Verzamelwaarde</div>
+            <div class="collection-summary-value" data-bind="collectionDetailValue">€ 0</div>
+          </div>
+        </div>
+
+        <div class="collection-summary-grid">
+          <div class="collection-summary-card">
+            <div class="collection-summary-label">Totaal betaald</div>
+            <div class="collection-summary-value" data-bind="collectionDetailPaid">€ 0</div>
+          </div>
+          <div class="collection-summary-card">
+            <div class="collection-summary-label">Resultaat</div>
+            <div class="collection-summary-value" data-bind="collectionDetailResult">€ 0</div>
+          </div>
+        </div>
+
+        <h3 class="section-title">Items in deze collectie</h3>
+        <div class="list" data-bind="collectionDetailItems"></div>
+      </section>
+
+      <!-- Analyse -->
+      <section class="page" data-page="analysis" aria-labelledby="analysis-title">
+        <button class="back-button" type="button" data-action="go" data-target="dashboard">← Dashboard</button>
+        <h2 id="analysis-title" class="page-heading">Analyse</h2>
+        <p class="page-lead">Een eerste analyse-laag over je volledige collectie. Bewust compact, maar voorbereid op uitgebreidere statistieken.</p>
+
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <div class="analysis-label">Totaal betaald</div>
+            <div class="analysis-value" data-bind="analysisPaid">€ 0</div>
+            <div class="analysis-note">Alle ingevoerde koopprijzen samen.</div>
+          </div>
+          <div class="analysis-card">
+            <div class="analysis-label">Verzamelwaarde</div>
+            <div class="analysis-value" data-bind="analysisValue">€ 0</div>
+            <div class="analysis-note">Huidige geschatte waarde.</div>
+          </div>
+        </div>
+
+        <div class="analysis-grid">
+          <div class="analysis-card">
+            <div class="analysis-label">Resultaat</div>
+            <div class="analysis-value" data-bind="analysisResult">€ 0</div>
+            <div class="analysis-note" data-bind="analysisResultNote">Nog geen resultaat.</div>
+          </div>
+          <div class="analysis-card">
+            <div class="analysis-label">Items</div>
+            <div class="analysis-value" data-bind="analysisCount">0</div>
+            <div class="analysis-note" data-bind="analysisAverage">Gemiddelde waarde: € 0</div>
+          </div>
+        </div>
+
+        <h3 class="section-title">Verdeling per collectie</h3>
+        <div class="card panel">
+          <div class="bar-list" data-bind="analysisCollectionBars"></div>
+        </div>
+
+        <h3 class="section-title">Herkomst</h3>
+        <div class="card panel">
+          <div class="bar-list" data-bind="analysisOriginBars"></div>
+        </div>
+
+        <h3 class="section-title">Goud & Zilver</h3>
+        <div class="card panel">
+          <div class="insight-list" data-bind="analysisMetalInsights"></div>
+        </div>
+      </section>
+
+      <!-- Instellingen -->
+      <section class="page" data-page="settings" aria-labelledby="settings-title">
+        <button class="back-button" type="button" data-action="go" data-target="dashboard">← Dashboard</button>
+        <h2 id="settings-title" class="page-heading">Instellingen</h2>
+        <p class="page-lead">Alles wat instelbaar is. Dev16 vereenvoudigt de app: geen aparte koerspagina meer; alleen de meest recente dagkoers wordt op de achtergrond gebruikt voor metaalwaarde.</p>
+        <div class="list">
+          <button class="list-row" type="button"><span class="row-main"><span class="row-title">Collecties beheren</span><span class="row-subtitle">Nieuwe collectie-soorten later toevoegen</span></span><span class="chevron">›</span></button>
+          <button class="list-row" type="button"><span class="row-main"><span class="row-title">Herkomsten beheren</span><span class="row-subtitle">Bronnen zoals kringloop, familie, Marktplaats</span></span><span class="chevron">›</span></button>
+          <button class="list-row" type="button"><span class="row-main"><span class="row-title">Back-up & export</span><span class="row-subtitle">Voorbereid op lokale back-up</span></span><span class="chevron">›</span></button>
+          <div class="list-row info-row"><span class="row-main"><span class="row-title">Dagkoers edelmetaal</span><span class="row-subtitle" data-bind="dailyPriceStatus">Wordt op de achtergrond bijgewerkt wanneer nodig</span></span><span class="chevron">•</span></div>
+          <button class="list-row" type="button"><span class="row-main"><span class="row-title">App-info</span><span class="row-subtitle">Collectie v0.1.0-dev17</span></span><span class="chevron">›</span></button>
+        </div>
+        <p class="foundation-note" style="margin-top:14px;">Architectuurkeuze: één <code>index.html</code> voor GitHub Pages/iPhone, met CSS en JavaScript strikt gescheiden in duidelijke blokken.</p>
+      </section>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /***************************************************************
+     COLLECTIE APP — v0.1.0-dev17
+     JAVASCRIPT-INHOUDSOPGAVE
+     1. App-configuratie
+     2. Database foundation
+     3. Storage/localStorage
+     4. Utilities
+     5. Navigatie/UI
+     6. Collecties
+     7. Item toevoegen en opslaan
+     8. Dagkoers-service
+     9. Dashboard
+     10. Analyse
+     11. Collectie-detail
+     12. App start
+     ***************************************************************/
+
+    /* 1. App-configuratie */
+    const App = {
+      version: '0.1.0-dev19',
+      storageKey: 'collectie-app-database-v1',
+      state: {
+        activePage: 'dashboard',
+        activeMetal: 'silver',
+        activePriceRange: '1w',
+        activeCollectionId: 'precious-metals',
+        editingItemId: null
+      },
+      database: null,
+      els: {}
+    };
+
+    /* 2. Database foundation */
+    const DefaultDatabase = {
+      schemaVersion: 1,
+      appVersion: '0.1.0-dev19',
+      settings: {
+        currency: 'EUR',
+        defaultCollectionId: 'precious-metals'
+      },
+      origins: [
+        { id: 'unknown', name: 'Onbekend' },
+        { id: 'family', name: 'Familie' },
+        { id: 'thrift', name: 'Kringloop' },
+        { id: 'marketplace', name: 'Marktplaats' }
+      ],
+      collections: [
+        {
+          id: 'precious-metals',
+          name: 'Goud & Zilver',
+          description: 'Edelmetaal, munten en objecten met goud- of zilverwaarde.',
+          fields: [
+            { id: 'metal', label: 'Metaal', type: 'select', options: ['Zilver', 'Goud'] },
+            { id: 'grams', label: 'Gram totaal', type: 'number', placeholder: 'Bijvoorbeeld 125,5' },
+            { id: 'purity', label: 'Gehalte', type: 'number', placeholder: 'Bijvoorbeeld 0,925' },
+            { id: 'origin', label: 'Herkomst', type: 'origin' }
+          ]
+        },
+        {
+          id: 'watches',
+          name: 'Horloges',
+          description: 'Voorbereid op merk, model, kaliber en staat.',
+          fields: [
+            { id: 'brand', label: 'Merk', type: 'text', placeholder: 'Bijvoorbeeld Omega' },
+            { id: 'model', label: 'Model', type: 'text', placeholder: 'Bijvoorbeeld Seamaster' },
+            { id: 'caliber', label: 'Kaliber', type: 'text', placeholder: 'Bijvoorbeeld 1010' },
+            { id: 'metal', label: 'Edelmetaal', type: 'select', options: ['Geen', 'Zilver', 'Goud'] },
+            { id: 'grams', label: 'Gram edelmetaal', type: 'number', placeholder: 'Bijvoorbeeld kastgewicht of goudgewicht' },
+            { id: 'purity', label: 'Gehalte', type: 'number', placeholder: 'Bijvoorbeeld 0,585 of 0,925' },
+            { id: 'origin', label: 'Herkomst', type: 'origin' }
+          ]
+        },
+        {
+          id: 'vinyl',
+          name: 'LP’s',
+          description: 'Voorbereid op artiest, titel, persing en staat.',
+          fields: [
+            { id: 'artist', label: 'Artiest', type: 'text', placeholder: 'Bijvoorbeeld Kraftwerk' },
+            { id: 'album', label: 'Album', type: 'text', placeholder: 'Titel' },
+            { id: 'pressing', label: 'Persing / type', type: 'text', placeholder: 'Bijvoorbeeld eerste persing' },
+            { id: 'origin', label: 'Herkomst', type: 'origin' }
+          ]
+        },
+        {
+          id: 'curiosa',
+          name: 'Curiosa',
+          description: 'Vrije categorie voor bijzondere objecten.',
+          fields: [
+            { id: 'title', label: 'Titel', type: 'text', placeholder: 'Naam of korte omschrijving' },
+            { id: 'category', label: 'Soort', type: 'text', placeholder: 'Bijvoorbeeld vaas, muntrol, sieraad' },
+            { id: 'origin', label: 'Herkomst', type: 'origin' }
+          ]
+        }
+      ],
+      items: [],
+      prices: {
+        silver: { name: 'Zilver', valuePerGram: 0.92, currency: 'EUR', usdPerOz: null, usdToEur: null, updatedAt: null, source: 'fallbackwaarde', history: [] },
+        gold: { name: 'Goud', valuePerGram: 69.50, currency: 'EUR', usdPerOz: null, usdToEur: null, updatedAt: null, source: 'fallbackwaarde', history: [] }
+      }
+    };
+
+    /* 3. Storage/localStorage */
+    const Storage = {
+      load() {
+        try {
+          const raw = localStorage.getItem(App.storageKey);
+          if (!raw) return Utils.clone(DefaultDatabase);
+          const parsed = JSON.parse(raw);
+          return Storage.migrate(parsed);
+        } catch (error) {
+          console.warn('Database laden mislukt. Standaarddatabase wordt gebruikt.', error);
+          return Utils.clone(DefaultDatabase);
+        }
+      },
+      save() {
+        App.database.appVersion = App.version;
+        localStorage.setItem(App.storageKey, JSON.stringify(App.database));
+      },
+      mergeCollections(defaultCollections, savedCollections) {
+        if (!Array.isArray(savedCollections)) return defaultCollections;
+        const savedById = new Map(savedCollections.map(collection => [collection.id, collection]));
+        const mergedBuiltIns = defaultCollections.map(defaultCollection => {
+          const saved = savedById.get(defaultCollection.id);
+          if (!saved) return defaultCollection;
+          return {
+            ...defaultCollection,
+            ...saved,
+            fields: defaultCollection.fields
+          };
+        });
+        const builtInIds = new Set(defaultCollections.map(collection => collection.id));
+        const customCollections = savedCollections.filter(collection => !builtInIds.has(collection.id));
+        return [...mergedBuiltIns, ...customCollections];
+      },
+      migrate(database) {
+        const fresh = Utils.clone(DefaultDatabase);
+        return {
+          ...fresh,
+          ...database,
+          settings: { ...fresh.settings, ...(database.settings || {}) },
+          origins: Array.isArray(database.origins) ? database.origins : fresh.origins,
+          collections: Storage.mergeCollections(fresh.collections, database.collections),
+          items: Array.isArray(database.items) ? database.items : [],
+          prices: { ...fresh.prices, ...(database.prices || {}) }
+        };
+      }
+    };
+
+    /* 4. Utilities */
+    const Utils = {
+      clone(value) {
+        return JSON.parse(JSON.stringify(value));
+      },
+      uid(prefix = 'id') {
+        return `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+      },
+      escapeHTML(value) {
+        return String(value ?? '').replace(/[&<>'"]/g, char => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;'
+        }[char]));
+      },
+      parseNumber(value) {
+        if (typeof value === 'number') return Number.isFinite(value) ? value : 0;
+        const normalised = String(value || '').trim().replace(/\./g, '').replace(',', '.');
+        const number = Number(normalised);
+        return Number.isFinite(number) ? number : 0;
+      },
+      formatCurrency(value) {
+        return new Intl.NumberFormat('nl-NL', {
+          style: 'currency',
+          currency: 'EUR',
+          maximumFractionDigits: 0
+        }).format(value || 0);
+      },
+      formatPricePerGram(value) {
+        return new Intl.NumberFormat('nl-NL', {
+          style: 'currency',
+          currency: 'EUR',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(value || 0) + '/g';
+      },
+      formatUsdPerOz(value) {
+        if (!value) return '$ 0,00/oz';
+        return new Intl.NumberFormat('nl-NL', {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(value) + '/oz';
+      },
+      metalValue(item) {
+        if (!item || !item.data) return null;
+        const grams = Number(item.data?.grams) || 0;
+        const purity = Number(item.data?.purity) || 0;
+        const metalName = String(item.data?.metal || '').toLowerCase();
+        if (!metalName || metalName.includes('geen')) return null;
+        const priceKey = metalName.includes('goud') ? 'gold' : metalName.includes('zilver') ? 'silver' : null;
+        const price = priceKey ? Number(App.database?.prices?.[priceKey]?.valuePerGram) || 0 : 0;
+        if (!grams || !purity || !price) return null;
+        return grams * purity * price;
+      },
+      formatDate(iso) {
+        return new Intl.DateTimeFormat('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(new Date(iso));
+      },
+      formatShortDateTime(iso) {
+        if (!iso) return 'onbekend';
+        return new Intl.DateTimeFormat('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(iso));
+      }
+    };
+
+    /* 5. Navigatie/UI */
+    const UI = {
+      init() {
+        App.els.pages = Array.from(document.querySelectorAll('.page'));
+        App.els.toast = document.getElementById('toast');
+        document.addEventListener('click', UI.handleClick);
+        Items.initSwipeDelete();
+      },
+      handleClick(event) {
+        const actionEl = event.target.closest('[data-action]');
+        if (!actionEl) return;
+
+        const action = actionEl.dataset.action;
+        if (action === 'go') UI.go(actionEl.dataset.target);
+        if (action === 'open-collection') Collections.openDetail(actionEl.dataset.collectionId);
+        if (action === 'save-item') AddItem.save();
+        if (action === 'cancel-edit') AddItem.cancelEdit();
+        if (action === 'edit-item') Items.edit(actionEl.dataset.itemId);
+      },
+      go(pageName) {
+        App.state.activePage = pageName;
+        App.els.pages.forEach(page => {
+          page.classList.toggle('is-active', page.dataset.page === pageName);
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      },
+      toast(message) {
+        if (!App.els.toast) return;
+        App.els.toast.textContent = message;
+        App.els.toast.classList.add('is-visible');
+        clearTimeout(UI.toastTimer);
+        UI.toastTimer = setTimeout(() => App.els.toast.classList.remove('is-visible'), 2400);
+      }
+    };
+
+    /* 6. Collecties */
+    const Collections = {
+      renderList() {
+        const target = document.querySelector('[data-bind="collectionsList"]');
+        target.innerHTML = App.database.collections.map(collection => {
+          const items = Collections.itemsFor(collection.id);
+          const value = items.reduce((sum, item) => sum + (Number(item.collectorValue) || 0), 0);
+          return `
+            <button class="list-row" type="button" data-action="open-collection" data-collection-id="${Utils.escapeHTML(collection.id)}">
+              <span class="row-main">
+                <span class="row-title">${Utils.escapeHTML(collection.name)}</span>
+                <span class="row-subtitle">${items.length} item${items.length === 1 ? '' : 's'} · ${Utils.formatCurrency(value)} verzamelwaarde</span>
+              </span>
+              <span class="chevron">›</span>
+            </button>
+          `;
+        }).join('');
+      },
+      renderItems() {
+        const target = document.querySelector('[data-bind="itemsList"]');
+        if (!target) return;
+        if (!App.database.items.length) {
+          target.innerHTML = '<div class="card panel"><p class="empty-note">Nog geen items opgeslagen. Voeg je eerste item toe via het dashboard.</p></div>';
+          return;
+        }
+
+        const items = [...App.database.items].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        target.innerHTML = items.map(item => Collections.itemTemplate(item)).join('');
+      },
+      openDetail(collectionId) {
+        App.state.activeCollectionId = collectionId;
+        Collections.renderDetail();
+        UI.go('collection-detail');
+      },
+      renderDetail() {
+        const collection = Collections.getById(App.state.activeCollectionId) || App.database.collections[0];
+        const target = document.querySelector('[data-bind="collectionDetailItems"]');
+        if (!collection || !target) return;
+
+        const items = Collections.itemsFor(collection.id).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const totalPaid = items.reduce((sum, item) => sum + (Number(item.purchasePrice) || 0), 0);
+        const totalValue = items.reduce((sum, item) => sum + (Number(item.collectorValue) || 0), 0);
+        const result = totalValue - totalPaid;
+
+        document.querySelector('[data-bind="collectionDetailTitle"]').textContent = collection.name;
+        document.querySelector('[data-bind="collectionDetailDescription"]').textContent = collection.description || 'Items binnen deze collectie.';
+        document.querySelector('[data-bind="collectionDetailType"]').textContent = 'Collectieoverzicht';
+        document.querySelector('[data-bind="collectionDetailCount"]').textContent = String(items.length);
+        document.querySelector('[data-bind="collectionDetailValue"]').textContent = Utils.formatCurrency(totalValue);
+        document.querySelector('[data-bind="collectionDetailPaid"]').textContent = Utils.formatCurrency(totalPaid);
+        document.querySelector('[data-bind="collectionDetailResult"]').textContent = Utils.formatCurrency(result);
+
+        if (!items.length) {
+          target.innerHTML = '<div class="card panel"><p class="empty-note">Nog geen items in deze collectie. Voeg een item toe en kies deze collectie.</p></div>';
+          return;
+        }
+        target.innerHTML = items.map(item => Collections.itemTemplate(item)).join('');
+      },
+      itemTemplate(item) {
+        const collection = Collections.getById(item.collectionId);
+        const title = Collections.itemTitle(item, collection);
+        const originName = Collections.originName(item.data.origin);
+        const metalValue = Utils.metalValue(item);
+        const metalValueHtml = metalValue !== null
+          ? `<span class="mini-stat"><span class="mini-label">Metaalwaarde</span><span class="mini-value">${Utils.formatCurrency(metalValue)}</span></span>`
+          : `<span class="mini-stat"><span class="mini-label">Metaalwaarde</span><span class="mini-value muted">n.v.t.</span></span>`;
+        return `
+          <div class="item-swipe" data-swipe-item-id="${Utils.escapeHTML(item.id)}">
+            <div class="item-delete-bg">Verwijderen</div>
+            <button class="item-card" type="button" data-action="edit-item" data-item-id="${Utils.escapeHTML(item.id)}" aria-label="Wijzig ${Utils.escapeHTML(title)}">
+              <div class="item-card-head">
+                <div>
+                  <div class="item-title">${Utils.escapeHTML(title)}</div>
+                  <div class="item-meta">${Utils.escapeHTML(collection?.name || 'Collectie')} · ${Utils.escapeHTML(originName)} · ${Utils.formatDate(item.createdAt)}</div>
+                </div>
+                <div class="version-pill">${Utils.escapeHTML(collection?.name?.slice(0, 2) || 'C')}</div>
+              </div>
+              <div class="item-values">
+                <span class="mini-stat"><span class="mini-label">Betaald</span><span class="mini-value">${Utils.formatCurrency(item.purchasePrice)}</span></span>
+                <span class="mini-stat"><span class="mini-label">Verzamelwaarde</span><span class="mini-value">${Utils.formatCurrency(item.collectorValue)}</span></span>
+                ${metalValueHtml}
+              </div>
+            </button>
+          </div>
+        `;
+      },
+      itemTitle(item, collection) {
+        if (item.data.title) return item.data.title;
+        if (item.data.artist || item.data.album) return [item.data.artist, item.data.album].filter(Boolean).join(' — ');
+        if (item.data.brand || item.data.model) return [item.data.brand, item.data.model].filter(Boolean).join(' ');
+        if (item.data.metal) return `${item.data.metal}${item.data.grams ? ` · ${item.data.grams}g` : ''}${item.data.purity ? ` · ${item.data.purity}` : ''}`;
+        return collection?.name || 'Item';
+      },
+      originName(originId) {
+        return App.database.origins.find(origin => origin.id === originId)?.name || 'Onbekend';
+      },
+      itemsFor(collectionId) {
+        return App.database.items.filter(item => item.collectionId === collectionId);
+      },
+      getById(id) {
+        return App.database.collections.find(collection => collection.id === id);
+      }
+    };
+
+
+    /* 7. Item wijzigen en verwijderen */
+    const Items = {
+      find(id) {
+        return App.database.items.find(item => item.id === id);
+      },
+      edit(id) {
+        const item = Items.find(id);
+        if (!item) {
+          UI.toast('Item niet gevonden.');
+          return;
+        }
+        AddItem.startEdit(item);
+      },
+      delete(id) {
+        const item = Items.find(id);
+        if (!item) return;
+        const title = Collections.itemTitle(item, Collections.getById(item.collectionId));
+        if (!confirm(`Verwijder "${title}" uit je collectie?`)) {
+          Items.resetSwipe(id);
+          return;
+        }
+        App.database.items = App.database.items.filter(existing => existing.id !== id);
+        Storage.save();
+        SafeRender.afterItemMutation();
+        UI.toast('Item verwijderd.');
+      },
+      resetSwipe(id) {
+        const wrap = document.querySelector(`[data-swipe-item-id="${CSS.escape(id)}"]`);
+        const card = wrap?.querySelector('.item-card');
+        if (wrap) wrap.classList.remove('is-swiping');
+        if (card) card.style.transform = '';
+      },
+      initSwipeDelete() {
+        let active = null;
+        document.addEventListener('pointerdown', event => {
+          const wrap = event.target.closest('[data-swipe-item-id]');
+          if (!wrap) return;
+          active = {
+            wrap,
+            card: wrap.querySelector('.item-card'),
+            id: wrap.dataset.swipeItemId,
+            startX: event.clientX,
+            startY: event.clientY,
+            dx: 0,
+            swiping: false
+          };
+        });
+        document.addEventListener('pointermove', event => {
+          if (!active || !active.card) return;
+          const dx = event.clientX - active.startX;
+          const dy = event.clientY - active.startY;
+          if (!active.swiping && Math.abs(dx) < 10) return;
+          if (!active.swiping && Math.abs(dy) > Math.abs(dx)) return;
+          if (dx >= 0) return;
+          active.swiping = true;
+          active.dx = Math.max(dx, -130);
+          active.wrap.classList.add('is-swiping');
+          active.card.style.transform = `translateX(${active.dx}px)`;
+        }, { passive: true });
+        document.addEventListener('pointerup', () => {
+          if (!active) return;
+          const { id, dx, swiping } = active;
+          if (swiping && dx < -82) Items.delete(id);
+          else Items.resetSwipe(id);
+          active = null;
+        });
+        document.addEventListener('pointercancel', () => {
+          if (active) Items.resetSwipe(active.id);
+          active = null;
+        });
+      }
+    };
+
+    /* 7. Item toevoegen en opslaan */
+    const AddItem = {
+      init() {
+        const select = document.querySelector('[data-role="collection-select"]');
+        select.innerHTML = App.database.collections.map(collection => `
+          <option value="${Utils.escapeHTML(collection.id)}">${Utils.escapeHTML(collection.name)}</option>
+        `).join('');
+        select.value = App.database.settings.defaultCollectionId;
+        select.addEventListener('change', AddItem.renderDynamicFields);
+        AddItem.renderDynamicFields();
+        AddItem.updateModeUI();
+      },
+      renderDynamicFields() {
+        const select = document.querySelector('[data-role="collection-select"]');
+        const target = document.getElementById('dynamicFields');
+        const collection = Collections.getById(select.value);
+        if (!collection) return;
+
+        target.innerHTML = collection.fields.map(field => AddItem.fieldTemplate(field)).join('');
+      },
+      fieldTemplate(field) {
+        if (field.type === 'select') {
+          return `
+            <div class="field">
+              <label for="field-${Utils.escapeHTML(field.id)}">${Utils.escapeHTML(field.label)}</label>
+              <select id="field-${Utils.escapeHTML(field.id)}" data-field-id="${Utils.escapeHTML(field.id)}" data-field-type="${Utils.escapeHTML(field.type)}">
+                ${field.options.map(option => `<option>${Utils.escapeHTML(option)}</option>`).join('')}
+              </select>
+            </div>`;
+        }
+        if (field.type === 'origin') {
+          return `
+            <div class="field">
+              <label for="field-${Utils.escapeHTML(field.id)}">${Utils.escapeHTML(field.label)}</label>
+              <select id="field-${Utils.escapeHTML(field.id)}" data-field-id="${Utils.escapeHTML(field.id)}" data-field-type="${Utils.escapeHTML(field.type)}">
+                ${App.database.origins.map(origin => `<option value="${Utils.escapeHTML(origin.id)}">${Utils.escapeHTML(origin.name)}</option>`).join('')}
+              </select>
+            </div>`;
+        }
+        return `
+          <div class="field">
+            <label for="field-${Utils.escapeHTML(field.id)}">${Utils.escapeHTML(field.label)}</label>
+            <input id="field-${Utils.escapeHTML(field.id)}" data-field-id="${Utils.escapeHTML(field.id)}" data-field-type="${Utils.escapeHTML(field.type)}" inputmode="${field.type === 'number' ? 'decimal' : 'text'}" placeholder="${Utils.escapeHTML(field.placeholder || '')}">
+          </div>`;
+      },
+      save() {
+        const select = document.querySelector('[data-role="collection-select"]');
+        const collectionId = select ? select.value : App.database.settings.defaultCollectionId;
+        const collection = Collections.getById(collectionId);
+        if (!collection) {
+          UI.toast('Kies eerst een collectie.');
+          return;
+        }
+
+        const data = {};
+        collection.fields.forEach(field => {
+          const input = document.querySelector(`[data-field-id="${field.id}"]`);
+          const raw = input ? input.value : '';
+          data[field.id] = field.type === 'number' ? Utils.parseNumber(raw) : String(raw).trim();
+        });
+
+        const now = new Date().toISOString();
+        const payload = {
+          collectionId,
+          data,
+          purchasePrice: Utils.parseNumber(document.getElementById('purchasePrice')?.value || ''),
+          collectorValue: Utils.parseNumber(document.getElementById('collectorValue')?.value || ''),
+          note: String(document.getElementById('note')?.value || '').trim(),
+          updatedAt: now
+        };
+
+        try {
+          if (App.state.editingItemId) {
+            const index = App.database.items.findIndex(existing => existing.id === App.state.editingItemId);
+            if (index === -1) throw new Error('Te wijzigen item niet gevonden.');
+            App.database.items[index] = {
+              ...App.database.items[index],
+              ...payload,
+              createdAt: App.database.items[index].createdAt || now,
+              attachments: App.database.items[index].attachments || [],
+              photos: App.database.items[index].photos || []
+            };
+          } else {
+            App.database.items.push({
+              id: Utils.uid('item'),
+              ...payload,
+              createdAt: now,
+              attachments: [],
+              photos: []
+            });
+          }
+          Storage.save();
+        } catch (error) {
+          console.error('Item opslaan mislukt:', error);
+          UI.toast('Opslaan mislukt. Controleer opslagruimte of browserinstellingen.');
+          return;
+        }
+
+        const wasEditing = Boolean(App.state.editingItemId);
+        AddItem.clearForm();
+        AddItem.exitEditMode();
+        SafeRender.afterItemMutation();
+        UI.toast(wasEditing ? 'Item bijgewerkt.' : 'Item opgeslagen.');
+        UI.go('collection');
+      },
+      startEdit(item) {
+        App.state.editingItemId = item.id;
+        const select = document.querySelector('[data-role="collection-select"]');
+        if (select) {
+          select.value = item.collectionId;
+          AddItem.renderDynamicFields();
+        }
+        const collection = Collections.getById(item.collectionId);
+        (collection?.fields || []).forEach(field => {
+          const input = document.querySelector(`[data-field-id="${field.id}"]`);
+          if (input) input.value = item.data?.[field.id] ?? '';
+        });
+        document.getElementById('purchasePrice').value = String(item.purchasePrice || '').replace('.', ',');
+        document.getElementById('collectorValue').value = String(item.collectorValue || '').replace('.', ',');
+        document.getElementById('note').value = item.note || '';
+        AddItem.updateModeUI();
+        UI.go('add-item');
+      },
+      cancelEdit() {
+        AddItem.clearForm();
+        AddItem.exitEditMode();
+        UI.toast('Wijzigen geannuleerd.');
+      },
+      exitEditMode() {
+        App.state.editingItemId = null;
+        AddItem.updateModeUI();
+      },
+      updateModeUI() {
+        const editing = Boolean(App.state.editingItemId);
+        const title = document.querySelector('[data-bind="addItemTitle"]');
+        const lead = document.querySelector('[data-bind="addItemLead"]');
+        const save = document.querySelector('[data-bind="saveItemButton"]');
+        const cancel = document.querySelector('[data-bind="cancelEditButton"]');
+        if (title) title.textContent = editing ? 'Item wijzigen' : 'Item toevoegen';
+        if (lead) lead.textContent = editing ? 'Pas de gegevens aan en sla je wijzigingen op.' : 'Voeg een item toe en sla het lokaal op in deze browser.';
+        if (save) save.textContent = editing ? 'Wijzigingen opslaan' : 'Item opslaan';
+        if (cancel) cancel.hidden = !editing;
+      },
+      clearForm() {
+        document.querySelectorAll('#dynamicFields input, #dynamicFields select').forEach(input => {
+          if (input.tagName === 'SELECT') input.selectedIndex = 0;
+          else input.value = '';
+        });
+        document.getElementById('purchasePrice').value = '';
+        document.getElementById('collectorValue').value = '';
+        document.getElementById('note').value = '';
+      }
+    };
+
+
+    /* 8. Robuuste renderlaag voor collectie-mutaties
+       Item toevoegen staat bewust los van de koersmodule. Een fout in live koersen
+       mag nooit voorkomen dat opslaan, dashboard, collectie en analyse werken. */
+    const SafeRender = {
+      call(label, fn) {
+        try { fn(); }
+        catch (error) { console.warn(`${label} renderen mislukt:`, error); }
+      },
+      core() {
+        SafeRender.call('Collectielijst', () => Collections.renderList());
+        SafeRender.call('Itemlijst', () => Collections.renderItems());
+        SafeRender.call('Collectiedetail', () => Collections.renderDetail());
+        SafeRender.call('Dashboard', () => Dashboard.render());
+        SafeRender.call('Analyse', () => Analysis.render());
+      },
+      prices() {
+        SafeRender.call('Dagkoersstatus', () => Prices.renderDailyPriceStatus());
+      },
+      all() {
+        SafeRender.core();
+        SafeRender.prices();
+      },
+      afterItemMutation() {
+        SafeRender.core();
+      }
+    };
+
+    /* 8. Dagelijkse goud- en zilverkoersen zonder API-key */
+    const Prices = {
+      troyOunceGrams: 31.1034768,
+      goldApiUrl(symbol) { return `https://api.gold-api.com/price/${symbol}`; },
+      fxSources: [
+        { name: 'Open ER API', url: 'https://open.er-api.com/v6/latest/USD', extract: data => Prices.extractNumber(data?.rates?.EUR) },
+        { name: 'ExchangeRate.host', url: 'https://api.exchangerate.host/latest?base=USD&symbols=EUR', extract: data => Prices.extractNumber(data?.rates?.EUR) },
+        { name: 'Floatrates', url: 'https://www.floatrates.com/daily/usd.json', extract: data => Prices.extractNumber(data?.eur?.rate) }
+      ],
+
+      normalisePriceDatabase() {
+        if (!App.database.prices) App.database.prices = Utils.clone(DefaultDatabase.prices);
+        if (!App.database.prices.silver) App.database.prices.silver = Utils.clone(DefaultDatabase.prices.silver);
+        if (!App.database.prices.gold) App.database.prices.gold = Utils.clone(DefaultDatabase.prices.gold);
+        if (!App.database.prices.meta) App.database.prices.meta = {};
+        for (const key of ['silver', 'gold']) {
+          if (!Array.isArray(App.database.prices[key].history)) App.database.prices[key].history = [];
+          App.database.prices[key].history = Prices.cleanHistory(App.database.prices[key].history).slice(-9000);
+        }
+      },
+
+      renderDailyPriceStatus() {
+        const el = document.querySelector('[data-bind="dailyPriceStatus"]');
+        if (!el) return;
+        const silver = App.database.prices?.silver;
+        const gold = App.database.prices?.gold;
+        const updatedAt = App.database.prices?.meta?.updatedAt || silver?.updatedAt || gold?.updatedAt;
+        const parts = [];
+        if (silver?.valuePerGram) parts.push(`Zilver ${Utils.formatPricePerGram(silver.valuePerGram)}`);
+        if (gold?.valuePerGram) parts.push(`Goud ${Utils.formatPricePerGram(gold.valuePerGram)}`);
+        const dateText = updatedAt ? `Bijgewerkt ${Utils.formatShortDateTime(updatedAt)}` : 'Nog niet live bijgewerkt';
+        el.textContent = `${parts.join(' · ')} — ${dateText}`;
+      },
+
+      setActiveMetal(metal) {
+        App.state.activeMetal = metal;
+        document.querySelectorAll('[data-action="metal-tab"]').forEach(tab => tab.classList.toggle('is-active', tab.dataset.metal === metal));
+        Prices.render();
+      },
+      setActiveRange(range) {
+        App.state.activePriceRange = range || '1w';
+        document.querySelectorAll('[data-action="price-range"]').forEach(tab => tab.classList.toggle('is-active', tab.dataset.range === App.state.activePriceRange));
+        Prices.render();
+      },
+      shouldRefreshToday() {
+        const meta = App.database.prices?.meta;
+        if (!meta?.updatedAt) return true;
+        return Prices.dateKey(meta.updatedAt) !== Prices.dateKey(new Date().toISOString());
+      },
+      dateKey(value) {
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        return date.toISOString().slice(0, 10);
+      },
+
+      async refreshLivePrices(showToast) {
+        Prices.normalisePriceDatabase();
+        if (!showToast && !Prices.shouldRefreshToday()) {
+          Prices.setStatus('Vandaag bijgewerkt');
+          Prices.render();
+          return;
+        }
+        Prices.setStatus('Laden');
+        Prices.setFeedback('');
+        App.database.prices.meta.lastAttemptAt = new Date().toISOString();
+        try {
+          const [gold, silver, fx] = await Promise.all([Prices.fetchGoldApiPrice('XAU'), Prices.fetchGoldApiPrice('XAG'), Prices.fetchFxRate()]);
+          Prices.applyLivePrice('gold', gold, fx.rate);
+          Prices.applyLivePrice('silver', silver, fx.rate);
+          App.database.prices.meta = {
+            ...App.database.prices.meta,
+            source: 'Gold-API + valuta-fallback',
+            updatedAt: new Date().toISOString(),
+            usdToEur: fx.rate,
+            fxSource: fx.source,
+            fxUrl: fx.url,
+            lastAttemptAt: new Date().toISOString(),
+            lastError: null
+          };
+          Storage.save();
+          SafeRender.all();
+          Prices.setStatus('Live');
+          Prices.setFeedback('');
+          if (showToast) UI.toast('Dagkoers bijgewerkt.');
+        } catch (error) {
+          console.warn('Dagkoersen laden mislukt. Laatst bekende koersen blijven zichtbaar.', error);
+          App.database.prices.meta.lastError = error.message || String(error);
+          Storage.save();
+          SafeRender.prices();
+          const hasAnyCachedPrice = Boolean(App.database.prices?.gold?.updatedAt || App.database.prices?.silver?.updatedAt);
+          Prices.setFeedback(hasAnyCachedPrice ? '' : 'Koersen konden niet worden geladen. Nog geen live koers beschikbaar.', !hasAnyCachedPrice);
+          if (showToast) UI.toast(hasAnyCachedPrice ? 'Live ophalen mislukt. Cache blijft staan.' : 'Koersen konden niet worden geladen.');
+        }
+      },
+
+      async fetchJSON(url, label) {
+        let response;
+        try { response = await fetch(url, { cache: 'no-store', mode: 'cors' }); }
+        catch (error) { throw new Error(`${label}: netwerk/CORS fout (${error.message || error})`); }
+        const contentType = response.headers.get('content-type') || '';
+        const text = await response.text();
+        if (!response.ok) throw new Error(`${label}: HTTP ${response.status} ${response.statusText || ''}`.trim());
+        if (!contentType.includes('json') && !text.trim().startsWith('{') && !text.trim().startsWith('[')) throw new Error(`${label}: geen JSON ontvangen (${contentType || 'onbekend content-type'})`);
+        try { return JSON.parse(text); }
+        catch { throw new Error(`${label}: JSON kon niet gelezen worden`); }
+      },
+      async fetchText(url, label) {
+        let response;
+        try { response = await fetch(url, { cache: 'no-store', mode: 'cors' }); }
+        catch (error) { throw new Error(`${label}: netwerk/CORS fout (${error.message || error})`); }
+        if (!response.ok) throw new Error(`${label}: HTTP ${response.status} ${response.statusText || ''}`.trim());
+        return response.text();
+      },
+      extractNumber(...values) {
+        for (const value of values) {
+          if (value === null || value === undefined || value === '') continue;
+          const cleaned = String(value).replace(/[^0-9,.-]/g, '').replace(',', '.');
+          const number = Number(cleaned);
+          if (Number.isFinite(number) && number > 0) return number;
+        }
+        return null;
+      },
+      async fetchGoldApiPrice(symbol) {
+        const data = await Prices.fetchJSON(Prices.goldApiUrl(symbol), `Gold-API ${symbol}`);
+        const rawPrice = Prices.extractNumber(data?.price, data?.ask, data?.bid, data?.value, data?.rate, data?.usd, data?.price_usd, data?.data?.price, data?.data?.usd);
+        if (!rawPrice) throw new Error(`Gold-API ${symbol}: geen bruikbare prijs in antwoord (${Object.keys(data || {}).join(', ') || 'leeg'})`);
+        const rawDate = data?.updatedAt || data?.updated_at || data?.timestamp || data?.time || data?.date || data?.updated;
+        let updatedAt = new Date().toISOString();
+        if (rawDate) {
+          const parsed = typeof rawDate === 'number' ? new Date(rawDate > 1e12 ? rawDate : rawDate * 1000) : new Date(rawDate);
+          if (!Number.isNaN(parsed.getTime())) updatedAt = parsed.toISOString();
+        }
+        return { symbol, usdPerOz: rawPrice, updatedAt, source: 'Gold-API', raw: data };
+      },
+      async fetchFxRate() {
+        const errors = [];
+        for (const source of Prices.fxSources) {
+          try {
+            const data = await Prices.fetchJSON(source.url, `${source.name} USD→EUR`);
+            const rate = source.extract(data);
+            if (Number.isFinite(rate) && rate > 0) return { rate, source: source.name, url: source.url, raw: data };
+            errors.push(`${source.name}: geen geldige EUR-rate in antwoord`);
+          } catch (error) { errors.push(error.message || String(error)); }
+        }
+        throw new Error(`USD→EUR: alle valutabronnen faalden: ${errors.join(' | ')}`);
+      },
+      applyLivePrice(key, metalData, usdToEur) {
+        const eurPerGram = (metalData.usdPerOz * usdToEur) / Prices.troyOunceGrams;
+        const current = App.database.prices[key] || {};
+        const history = Prices.cleanHistory(Array.isArray(current.history) ? current.history : []);
+        const pointDate = Prices.dateKey(metalData.updatedAt || new Date().toISOString());
+        const point = { at: metalData.updatedAt || new Date().toISOString(), valuePerGram: eurPerGram, usdPerOz: metalData.usdPerOz, usdToEur, source: 'Live dagkoers', isReal: true, isLive: true };
+        const existingSameDay = history.findIndex(row => Prices.dateKey(row.at) === pointDate);
+        if (existingSameDay >= 0) history[existingSameDay] = point;
+        else history.push(point);
+        App.database.prices[key] = { ...current, valuePerGram: eurPerGram, usdPerOz: metalData.usdPerOz, usdToEur, source: 'Gold-API + valuta-fallback', updatedAt: metalData.updatedAt || new Date().toISOString(), history: Prices.cleanHistory(history).slice(-9000) };
+      },
+
+      render() {
+        Prices.normalisePriceDatabase();
+        Prices.renderDailyPriceStatus();
+        const metal = App.database.prices[App.state.activeMetal] || App.database.prices.silver;
+        const metalNameEl = document.querySelector('[data-bind="metalName"]');
+        const metalPriceEl = document.querySelector('[data-bind="metalPrice"]');
+        if (metalNameEl) metalNameEl.textContent = metal.name;
+        if (metalPriceEl) metalPriceEl.textContent = Utils.formatPricePerGram(metal.valuePerGram);
+        const usdEl = document.querySelector('[data-bind="metalUsdOz"]');
+        if (usdEl) usdEl.textContent = Utils.formatUsdPerOz(metal.usdPerOz);
+        const fxEl = document.querySelector('[data-bind="metalFxRate"]');
+        if (fxEl) fxEl.textContent = metal.usdToEur ? `1 USD = € ${Number(metal.usdToEur).toFixed(4).replace('.', ',')}` : 'Nog niet bekend';
+        const sourceEl = document.querySelector('[data-bind="priceSource"]');
+        if (sourceEl) sourceEl.textContent = Prices.getSourceText(metal);
+        const updatedEl = document.querySelector('[data-bind="priceUpdated"]');
+        if (updatedEl) updatedEl.textContent = Prices.getUpdatedText(metal);
+        const statusEl = document.querySelector('[data-bind="priceStatus"]');
+        if (statusEl) {
+          if (metal.updatedAt && Prices.dateKey(metal.updatedAt) === Prices.dateKey(new Date().toISOString())) statusEl.textContent = 'Live';
+          else if (metal.updatedAt) statusEl.textContent = 'Cache';
+          else statusEl.textContent = 'Fallback';
+        }
+        const meta = App.database.prices?.meta || {};
+        if (meta.lastError && !metal.updatedAt) Prices.setFeedback('Koersen konden niet worden geladen. Nog geen live koers beschikbaar.', true);
+        else Prices.setFeedback('');
+        Prices.renderChart(metal);
+      },
+      getSourceText(metal) {
+        const source = metal.source || 'fallbackwaarde';
+        if (!metal.updatedAt) return `Bron: ${source}. Nog geen dagkoers geladen.`;
+        const meta = App.database.prices?.meta || {};
+        const historySource = meta.historyStatus === 'recent' ? ` Historie: ${meta.historySource}.` : ' Historie groeit vanaf nu automatisch via dagelijkse live cache.';
+        return `Bron: ${source}. USD/oz omgerekend naar EUR/g. Maximaal één automatische update per dag.${historySource}`;
+      },
+      getUpdatedText(metal) {
+        if (!metal.updatedAt) return 'Nog niet bijgewerkt';
+        try { return `Bijgewerkt ${new Intl.DateTimeFormat('nl-NL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(metal.updatedAt))}`; }
+        catch { return 'Bijgewerkt'; }
+      },
+      setStatus(status) { const el = document.querySelector('[data-bind="priceStatus"]'); if (el) el.textContent = status; },
+      setFeedback(message, isError = false) {
+        const el = document.querySelector('[data-bind="priceFeedback"]');
+        if (!el) return;
+        el.textContent = message || '';
+        el.classList.toggle('is-error', Boolean(isError));
+      },
+
+      async runDiagnostics() {
+        const target = document.querySelector('[data-bind="priceDiagnostics"]');
+        const log = document.querySelector('[data-bind="priceDiagnosticLog"]');
+        const startedAt = new Date();
+        const checks = [
+          { title: 'Gold-API goud (XAU)', run: () => Prices.fetchGoldApiPrice('XAU'), format: result => `${Utils.formatUsdPerOz(result.usdPerOz)} — ${Prices.goldApiUrl('XAU')}` },
+          { title: 'Gold-API zilver (XAG)', run: () => Prices.fetchGoldApiPrice('XAG'), format: result => `${Utils.formatUsdPerOz(result.usdPerOz)} — ${Prices.goldApiUrl('XAG')}` },
+          { title: 'USD→EUR valutafallbacks', run: () => Prices.fetchFxRate(), format: result => `1 USD = € ${Number(result.rate).toFixed(4).replace('.', ',')} — ${result.source} — ${result.url}` },
+          { title: 'Historische koersdata', run: () => Prices.fetchHistoricalMetalData(), format: result => `${result.gold.length} goudpunten, ${result.silver.length} zilverpunten — ${result.source || 'historische bron'} — laatste: ${Prices.chartLabel((result.gold[result.gold.length - 1] || result.silver[result.silver.length - 1] || {}).at, '1w') || 'onbekend'}${result.recent ? '' : ' — niet actueel genoeg voor grafiek'}` }
+        ];
+        if (target) target.innerHTML = checks.map(check => Prices.diagnosticRow(check.title, 'Testen', 'Bezig…', '')).join('');
+        if (log) log.textContent = `Diagnose gestart: ${startedAt.toLocaleString('nl-NL')}\nBrowser: ${navigator.userAgent}\nOnline volgens browser: ${navigator.onLine ? 'ja' : 'nee'}\n`;
+        const results = [];
+        for (const check of checks) {
+          const item = { ...check, ok: false, detail: '' };
+          try { const result = await check.run(); item.ok = true; item.detail = check.format(result); }
+          catch (error) { item.detail = error.message || String(error); }
+          results.push(item);
+          if (target) target.innerHTML = results.map(result => Prices.diagnosticRow(result.title, result.ok ? 'OK' : 'Fout', result.detail, result.ok ? 'ok' : 'fail')).join('') + checks.slice(results.length).map(check => Prices.diagnosticRow(check.title, 'Wacht', 'Nog niet getest.', '')).join('');
+          if (log) log.textContent += `\n${item.ok ? '✓' : '✗'} ${item.title}: ${item.detail}`;
+        }
+        UI.toast(results.every(result => result.ok) ? 'Live koerscontrole afgerond.' : 'Diagnose afgerond met aandachtspunten.');
+      },
+      diagnosticRow(title, status, detail, stateClass) {
+        return `<div class="diagnostic-row"><div class="diagnostic-top"><span class="diagnostic-title">${Utils.escapeHTML(title)}</span><span class="diagnostic-status ${stateClass || ''}">${Utils.escapeHTML(status)}</span></div><div class="diagnostic-detail">${Utils.escapeHTML(detail)}</div></div>`;
+      },
+
+      async refreshHistoricalPrices(showToast = true) {
+        Prices.normalisePriceDatabase();
+        const meta = App.database.prices.meta || {};
+        if (meta.historyUpdatedAt && Prices.dateKey(meta.historyUpdatedAt) === Prices.dateKey(new Date().toISOString())) { Prices.render(); return; }
+        const fx = await Prices.fetchFxRate().catch(() => ({ rate: meta.usdToEur || App.database.prices.silver?.usdToEur || App.database.prices.gold?.usdToEur || 0.8743, source: 'cache' }));
+        const data = await Prices.fetchHistoricalMetalData();
+        if (!data.recent) {
+          App.database.prices.meta.historyStatus = 'stale';
+          App.database.prices.meta.historyWarning = `Historische bron is niet actueel genoeg (${data.source || 'bron onbekend'}). Grafieken gebruiken daarom alleen actuele live-cache.`;
+          App.database.prices.meta.historySource = data.source || 'Niet-actuele historische bron';
+          App.database.prices.meta.historyLastDate = data.lastDate || null;
+          App.database.prices.meta.historyUpdatedAt = new Date().toISOString();
+          Storage.save();
+          Prices.render();
+          if (showToast) UI.toast('Historiebron is niet actueel; live-cache blijft leidend.');
+          return;
+        }
+        App.database.prices.gold.history = Prices.mergeLivePoint(Prices.convertHistoricalToEurGram(data.gold, fx.rate), App.database.prices.gold);
+        App.database.prices.silver.history = Prices.mergeLivePoint(Prices.convertHistoricalToEurGram(data.silver, fx.rate), App.database.prices.silver);
+        App.database.prices.meta.historyUpdatedAt = new Date().toISOString();
+        App.database.prices.meta.historySource = data.source || 'Historische koersbron';
+        App.database.prices.meta.historyFxSource = fx.source;
+        App.database.prices.meta.historyStatus = 'recent';
+        App.database.prices.meta.historyWarning = null;
+        Storage.save();
+        Prices.render();
+        if (showToast) UI.toast('Historische grafieken bijgewerkt.');
+      },
+
+      async fetchHistoricalMetalData() {
+        const errors = [];
+        try {
+          const [goldYahoo, silverYahoo] = await Promise.all([
+            Prices.fetchJSON('https://query1.finance.yahoo.com/v8/finance/chart/GC=F?range=20y&interval=1d', 'Yahoo Finance goudhistorie'),
+            Prices.fetchJSON('https://query1.finance.yahoo.com/v8/finance/chart/SI=F?range=20y&interval=1d', 'Yahoo Finance zilverhistorie')
+          ]);
+          const gold = Prices.parseYahooChart(goldYahoo, 'Yahoo Finance GC=F');
+          const silver = Prices.parseYahooChart(silverYahoo, 'Yahoo Finance SI=F');
+          if (gold.length >= 2 && silver.length >= 2) return { gold, silver, source: 'Yahoo Finance futures dagelijkse historie', recent: Prices.isHistoryRecentEnough(gold, 10) && Prices.isHistoryRecentEnough(silver, 10), lastDate: Prices.lastDateFromRows([gold, silver]) };
+          errors.push('Yahoo Finance: te weinig punten');
+        } catch (error) { errors.push(error.message || String(error)); }
+        try {
+          const [goldCsv, silverCsv] = await Promise.all([
+            Prices.fetchText('https://stooq.com/q/d/l/?s=xauusd&i=d', 'Stooq XAUUSD historie'),
+            Prices.fetchText('https://stooq.com/q/d/l/?s=xagusd&i=d', 'Stooq XAGUSD historie')
+          ]);
+          const gold = Prices.parseStooqCsv(goldCsv, 'Stooq XAUUSD');
+          const silver = Prices.parseStooqCsv(silverCsv, 'Stooq XAGUSD');
+          if (gold.length >= 2 && silver.length >= 2) return { gold, silver, source: 'Stooq dagelijkse historie', recent: Prices.isHistoryRecentEnough(gold, 10) && Prices.isHistoryRecentEnough(silver, 10), lastDate: Prices.lastDateFromRows([gold, silver]) };
+          errors.push('Stooq: te weinig punten');
+        } catch (error) { errors.push(error.message || String(error)); }
+        try {
+          const [goldCsv, ratioCsv] = await Promise.all([
+            Prices.fetchText('https://freegoldapi.com/data/latest.csv', 'FreeGoldAPI goudhistorie'),
+            Prices.fetchText('https://freegoldapi.com/data/gold_silver_ratio_enriched.csv', 'FreeGoldAPI goud/zilver ratio')
+          ]);
+          const gold = Prices.parseFreeGoldCsv(goldCsv);
+          const ratioRows = Prices.parseCsv(ratioCsv);
+          const silver = ratioRows.map(row => {
+            const goldPrice = Prices.extractNumber(row.price);
+            const ratio = Prices.extractNumber(row.silver_oz_per_gold_oz, row.ratio, row.gold_silver_ratio);
+            return { at: row.date, usdPerOz: goldPrice && ratio ? goldPrice / ratio : null, source: 'FreeGoldAPI ratio', isReal: true };
+          }).filter(row => row.at && Number(row.usdPerOz) > 0);
+          if (gold.length >= 2 && silver.length >= 2) return { gold, silver, source: 'FreeGoldAPI + ratio dataset', recent: Prices.isHistoryRecentEnough(gold, 10) && Prices.isHistoryRecentEnough(silver, 10), lastDate: Prices.lastDateFromRows([gold, silver]) };
+          errors.push('FreeGoldAPI: te weinig punten');
+        } catch (error) { errors.push(error.message || String(error)); }
+        throw new Error(`Historische koersdata: alle bronnen faalden of waren onbruikbaar: ${errors.join(' | ')}`);
+      },
+      parseCsv(text) {
+        const lines = String(text || '').trim().split(/\r?\n/).filter(Boolean);
+        if (!lines.length) return [];
+        const headers = lines.shift().split(',').map(header => header.trim());
+        return lines.map(line => { const values = line.split(','); const row = {}; headers.forEach((header, index) => { row[header] = values[index]; }); return row; });
+      },
+      parseStooqCsv(text, source) {
+        return Prices.parseCsv(text).map(row => ({ at: row.Date || row.date || row.DATE, usdPerOz: Prices.extractNumber(row.Close, row.close, row.CLOSE, row.Last, row.last), source, isReal: true })).filter(row => row.at && Number(row.usdPerOz) > 0).sort((a, b) => new Date(a.at) - new Date(b.at));
+      },
+      parseYahooChart(data, source) {
+        const result = data?.chart?.result?.[0]; const timestamps = result?.timestamp || []; const closes = result?.indicators?.quote?.[0]?.close || [];
+        return timestamps.map((stamp, index) => ({ at: new Date(Number(stamp) * 1000).toISOString(), usdPerOz: Number(closes[index]), source, isReal: true })).filter(row => row.at && Number(row.usdPerOz) > 0).sort((a, b) => new Date(a.at) - new Date(b.at));
+      },
+      parseFreeGoldCsv(text) {
+        const rawLines = String(text || '').trim().split(/\r?\n/).filter(Boolean); if (!rawLines.length) return [];
+        const first = rawLines[0].toLowerCase(); const hasHeader = first.includes('date') || first.includes('price');
+        const rows = hasHeader ? Prices.parseCsv(text) : rawLines.map(line => { const values = line.split(','); return { date: values[0], price: values[1], source: values[2] || 'FreeGoldAPI' }; });
+        return rows.map(row => ({ at: row.date || row.Date || row.DATE, usdPerOz: Prices.extractNumber(row.price, row.Price, row.PRICE, row.value, row.close), source: row.source || 'FreeGoldAPI', isReal: true })).filter(row => row.at && Number(row.usdPerOz) > 0).sort((a, b) => new Date(a.at) - new Date(b.at));
+      },
+      isHistoryRecentEnough(rows, maxAgeDays = 10) {
+        if (!Array.isArray(rows) || rows.length < 2) return false;
+        const last = new Date(rows[rows.length - 1].at).getTime(); if (!Number.isFinite(last)) return false;
+        return (Date.now() - last) <= maxAgeDays * 86400000;
+      },
+      lastDateFromRows(groups) { const times = groups.flat().map(row => new Date(row.at).getTime()).filter(Number.isFinite); return times.length ? new Date(Math.max(...times)).toISOString() : null; },
+      convertHistoricalToEurGram(rows, usdToEur) {
+        const fx = Number(usdToEur) || 0.8743;
+        return Prices.cleanHistory(rows.map(row => ({ at: row.at, valuePerGram: (Number(row.usdPerOz) * fx) / Prices.troyOunceGrams, usdPerOz: Number(row.usdPerOz), usdToEur: fx, source: row.source, isReal: row.isReal !== false, isLive: false })));
+      },
+      cleanHistory(rows) {
+        const byDate = new Map();
+        for (const row of Array.isArray(rows) ? rows : []) {
+          const value = Number(row.valuePerGram); const dateKey = Prices.dateKey(row.at);
+          if (!dateKey || !Number.isFinite(value) || value <= 0) continue;
+          const current = byDate.get(dateKey);
+          if (!current || row.isLive || new Date(row.at) > new Date(current.at)) byDate.set(dateKey, { ...row, valuePerGram: value, at: row.at || `${dateKey}T12:00:00.000Z` });
+        }
+        return Array.from(byDate.values()).sort((a, b) => new Date(a.at) - new Date(b.at));
+      },
+      mergeLivePoint(history, metal) {
+        const merged = Prices.cleanHistory(history); const liveValue = Number(metal?.valuePerGram); const liveDate = metal?.updatedAt || new Date().toISOString();
+        if (!Number.isFinite(liveValue) || liveValue <= 0) return merged;
+        const liveKey = Prices.dateKey(liveDate);
+        const point = { at: liveDate, valuePerGram: liveValue, usdPerOz: Number(metal?.usdPerOz) || null, usdToEur: Number(metal?.usdToEur) || null, source: 'Live dagkoers', isReal: true, isLive: true };
+        const index = merged.findIndex(row => Prices.dateKey(row.at) === liveKey); if (index >= 0) merged[index] = point; else merged.push(point);
+        return Prices.cleanHistory(merged);
+      },
+      getChartHistory(metal, range) {
+        const points = Prices.mergeLivePoint(Array.isArray(metal.history) ? metal.history : [], metal);
+        const value = Number(metal.valuePerGram) || 1; const days = Prices.rangeToDays(range); const end = Prices.chartEndDate(metal); const start = new Date(end.getTime() - (days - 1) * 86400000);
+        const inRange = points.filter(point => { const time = new Date(point.at).getTime(); return Number.isFinite(time) && time >= start.getTime() && time <= end.getTime() + 86399999; });
+        if (range === '1w' || range === '1m') { const daily = Prices.buildDailySeries(inRange, start, end, value); return { points: daily.points, segments: daily.segments, enough: daily.realCount >= 2, hasGaps: daily.hasGaps, start, end }; }
+        if (inRange.length >= 2) { const sampled = Prices.samplePoints(inRange, Prices.rangeToPointCount(range)); return { points: sampled, segments: Prices.segmentPoints(sampled, range), enough: sampled.length >= 2, hasGaps: Prices.hasLargeGaps(sampled, range), start, end }; }
+        const flat = Prices.makeFlatHistory(value, start, end, Prices.rangeToPointCount(range)); return { points: flat, segments: [flat], enough: false, hasGaps: false, start, end };
+      },
+      chartEndDate(metal) {
+        const candidates = [metal?.updatedAt, new Date().toISOString()].map(value => new Date(value).getTime()).filter(Number.isFinite);
+        const date = new Date(Math.max(...candidates)); date.setHours(12, 0, 0, 0); return date;
+      },
+      buildDailySeries(points, start, end, fallbackValue) {
+        const sorted = points.slice().sort((a, b) => new Date(a.at) - new Date(b.at));
+        const byDate = new Map(sorted.map(row => [Prices.dateKey(row.at), row]));
+        const series = []; const segments = []; let currentSegment = []; let lastKnown = null; let realCount = 0; let hasGaps = false;
+        for (let day = new Date(start); day.getTime() <= end.getTime() + 1; day = new Date(day.getTime() + 86400000)) {
+          day.setHours(12, 0, 0, 0); const key = Prices.dateKey(day.toISOString()); const actual = byDate.get(key);
+          if (actual) { lastKnown = actual; realCount += 1; const point = { ...actual, at: day.toISOString(), carriedForward: false }; series.push(point); currentSegment.push(point); }
+          else if (lastKnown) {
+            const ageDays = Math.round((day.getTime() - new Date(lastKnown.at).getTime()) / 86400000);
+            if (ageDays <= 3) { const point = { ...lastKnown, at: day.toISOString(), carriedForward: true }; series.push(point); currentSegment.push(point); }
+            else { hasGaps = true; if (currentSegment.length) segments.push(currentSegment); currentSegment = []; }
+          }
+        }
+        if (currentSegment.length) segments.push(currentSegment);
+        if (!series.length) { const flat = Prices.makeFlatHistory(fallbackValue, start, end, Prices.rangeToPointCount(App.state.activePriceRange || '1w')); return { points: flat, segments: [flat], realCount: 0, hasGaps: false }; }
+        return { points: series, segments: segments.length ? segments : [series], realCount, hasGaps };
+      },
+      segmentPoints(points, range) {
+        if (!points.length) return [];
+        const segments = []; let current = [points[0]];
+        const allowed = Math.max(14, Prices.rangeToDays(range) * 0.08);
+        for (let i = 1; i < points.length; i += 1) {
+          const gapDays = (new Date(points[i].at) - new Date(points[i - 1].at)) / 86400000;
+          if (gapDays > allowed) { segments.push(current); current = [points[i]]; }
+          else current.push(points[i]);
+        }
+        if (current.length) segments.push(current);
+        return segments;
+      },
+      hasLargeGaps(points, range) {
+        if (points.length < 2) return false;
+        const allowed = Math.max(14, Prices.rangeToDays(range) * 0.08);
+        for (let i = 1; i < points.length; i += 1) if ((new Date(points[i].at) - new Date(points[i - 1].at)) / 86400000 > allowed) return true;
+        return false;
+      },
+      renderChart(metal) {
+        const box = document.querySelector('[data-bind="priceChart"]'); if (!box) return;
+        const range = App.state.activePriceRange || '1w'; const chart = Prices.getChartHistory(metal, range);
+        const noteEl = document.querySelector('[data-bind="chartNote"]'); const summaryEl = document.querySelector('[data-bind="chartSummary"]');
+        if (noteEl) {
+          if (!chart.enough) noteEl.textContent = 'Nog te weinig actuele dagpunten voor deze periode. Vanaf nu groeit de grafiek automatisch met iedere dagelijkse live koers.';
+          else if (chart.hasGaps) noteEl.textContent = 'Historische bron is niet volledig actueel; gaten worden niet kunstmatig aan elkaar verbonden.';
+          else noteEl.textContent = 'Grafiek op basis van consistente dagpunten in EUR/g. Weekenddagen tellen mee met de laatst bekende dagkoers.';
+        }
+        const values = chart.points.map(point => Number(point.valuePerGram)).filter(value => Number.isFinite(value) && value > 0);
+        if (!values.length) values.push(Number(metal.valuePerGram) || 1);
+        const rawMin = Math.min(...values); const rawMax = Math.max(...values); const nice = Prices.niceScale(rawMin, rawMax);
+        const width = 360, height = 170, padLeft = 20, padRight = 18, padTop = 24, padBottom = 34;
+        const chartW = width - padLeft - padRight, chartH = height - padTop - padBottom;
+        const startTime = chart.start.getTime(), endTime = chart.end.getTime(), timeSpan = Math.max(endTime - startTime, 1);
+        const yFor = value => padTop + (1 - ((value - nice.min) / Math.max(nice.max - nice.min, 0.000001))) * chartH;
+        const xFor = at => padLeft + ((new Date(at).getTime() - startTime) / timeSpan) * chartW;
+        const pointToString = point => `${xFor(point.at).toFixed(1)},${yFor(point.valuePerGram).toFixed(1)}`;
+        const segmentLines = chart.segments.filter(segment => segment.length >= 2).map(segment => `<polyline class="chart-main-line" points="${segment.map(pointToString).join(' ')}"></polyline>`).join('');
+        const areaSegments = chart.segments.filter(segment => segment.length >= 2).map(segment => { const first = segment[0], last = segment[segment.length - 1], baseY = padTop + chartH; return `<polygon class="chart-main-area" points="${xFor(first.at).toFixed(1)},${baseY.toFixed(1)} ${segment.map(pointToString).join(' ')} ${xFor(last.at).toFixed(1)},${baseY.toFixed(1)}"></polygon>`; }).join('');
+        const lastPoint = chart.points[chart.points.length - 1] || { at: chart.end.toISOString(), valuePerGram: Number(metal.valuePerGram) || 1 };
+        const hLines = nice.ticks.map(value => `<line class="chart-grid-line" x1="${padLeft}" y1="${yFor(value).toFixed(1)}" x2="${padLeft + chartW}" y2="${yFor(value).toFixed(1)}"></line>`).join('');
+        const vLines = [0, .5, 1].map(t => { const x = padLeft + t * chartW; return `<line class="chart-grid-line vertical" x1="${x.toFixed(1)}" y1="${padTop}" x2="${x.toFixed(1)}" y2="${padTop + chartH}"></line>`; }).join('');
+        const flatLine = chart.segments.every(segment => segment.length < 2) ? `<line class="chart-main-line" x1="${padLeft}" y1="${yFor(values[0]).toFixed(1)}" x2="${padLeft + chartW}" y2="${yFor(values[0]).toFixed(1)}"></line>` : '';
+        box.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Koersgrafiek ${Utils.escapeHTML(metal.name)} ${Utils.escapeHTML(range)}">${hLines}${vLines}${areaSegments}${flatLine}${segmentLines}<circle class="chart-last-dot" cx="${xFor(lastPoint.at).toFixed(1)}" cy="${yFor(lastPoint.valuePerGram).toFixed(1)}" r="4.5"></circle><text class="chart-axis-label" x="${padLeft}" y="14">${Utils.escapeHTML(Utils.formatPricePerGram(nice.max))}</text><text class="chart-axis-label muted" x="${padLeft}" y="${(padTop + chartH / 2 - 4).toFixed(1)}">${Utils.escapeHTML(Utils.formatPricePerGram((nice.min + nice.max) / 2))}</text><text class="chart-axis-label" x="${padLeft}" y="${height - 6}">${Utils.escapeHTML(Utils.formatPricePerGram(nice.min))}</text><text class="chart-axis-label date" x="${padLeft}" y="${height - 25}">${Utils.escapeHTML(Prices.chartLabel(chart.start, range))}</text><text class="chart-axis-label date" x="${padLeft + chartW}" y="${height - 25}" text-anchor="end">${Utils.escapeHTML(Prices.chartLabel(chart.end, range))}</text></svg>`;
+        if (summaryEl) {
+          const first = values[0] || 0, last = values[values.length - 1] || first, diff = last - first, pct = first > 0 ? (diff / first) * 100 : 0, trendClass = diff >= 0 ? 'positive' : 'negative';
+          summaryEl.innerHTML = `<div class="chart-summary-item"><div class="chart-summary-label">Hoogste</div><div class="chart-summary-value">${Utils.formatPricePerGram(rawMax)}</div></div><div class="chart-summary-item"><div class="chart-summary-label">Laagste</div><div class="chart-summary-value">${Utils.formatPricePerGram(rawMin)}</div></div><div class="chart-summary-item"><div class="chart-summary-label">Verschil</div><div class="chart-summary-value ${trendClass}">${diff >= 0 ? '+' : ''}${pct.toFixed(2).replace('.', ',')}%</div></div>`;
+        }
+      },
+      niceScale(rawMin, rawMax) {
+        let min = Number(rawMin), max = Number(rawMax);
+        if (!Number.isFinite(min) || !Number.isFinite(max) || min <= 0 || max <= 0) return { min: 0, max: 1, ticks: [0, .25, .5, .75, 1] };
+        if (Math.abs(max - min) < max * 0.002) { min = max * 0.995; max = max * 1.005; }
+        const padding = (max - min) * 0.12; min = Math.max(0, min - padding); max += padding;
+        const step = Prices.niceStep((max - min) / 4); const niceMin = Math.max(0, Math.floor(min / step) * step); const niceMax = Math.ceil(max / step) * step;
+        const ticks = []; for (let value = niceMin; value <= niceMax + step / 2; value += step) ticks.push(value); while (ticks.length > 5) ticks.splice(1, 1);
+        return { min: niceMin, max: niceMax, ticks };
+      },
+      niceStep(value) { const exponent = Math.floor(Math.log10(value || 1)); const fraction = value / Math.pow(10, exponent); return (fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10) * Math.pow(10, exponent); },
+      rangeToDays(range) { return ({ '1w': 7, '1m': 31, '6m': 183, '1j': 365, '5j': 365 * 5, '20j': 365 * 20 })[range] || 7; },
+      rangeToPointCount(range) { return ({ '1w': 7, '1m': 31, '6m': 40, '1j': 52, '5j': 90, '20j': 120 })[range] || 7; },
+      samplePoints(points, targetCount) { if (points.length <= targetCount) return points; const result = []; const step = (points.length - 1) / (targetCount - 1); for (let i = 0; i < targetCount; i += 1) result.push(points[Math.round(i * step)]); return result; },
+      chartLabel(value, range) { const date = new Date(value); if (Number.isNaN(date.getTime())) return ''; if (range === '1w' || range === '1m') return new Intl.DateTimeFormat('nl-NL', { day: '2-digit', month: '2-digit' }).format(date); return new Intl.DateTimeFormat('nl-NL', { month: '2-digit', year: '2-digit' }).format(date); },
+      makeFlatHistory(value, start, end, count) { const base = Number(value) || 1, safeCount = Math.max(Number(count) || 2, 2); return Array.from({ length: safeCount }, (_, index) => { const t = safeCount <= 1 ? 0 : index / (safeCount - 1); return { at: new Date(start.getTime() + (end.getTime() - start.getTime()) * t).toISOString(), valuePerGram: base, isReal: false }; }); }
+    };
+
+    /* 10. Analyse */
+    const Analysis = {
+      render() {
+        const items = App.database.items;
+        const totalPaid = items.reduce((sum, item) => sum + (Number(item.purchasePrice) || 0), 0);
+        const totalValue = items.reduce((sum, item) => sum + (Number(item.collectorValue) || 0), 0);
+        const result = totalValue - totalPaid;
+        const average = items.length ? totalValue / items.length : 0;
+
+        Analysis.setText('analysisPaid', Utils.formatCurrency(totalPaid));
+        Analysis.setText('analysisValue', Utils.formatCurrency(totalValue));
+        Analysis.setText('analysisResult', Utils.formatCurrency(result));
+        Analysis.setText('analysisCount', String(items.length));
+        Analysis.setText('analysisAverage', `Gemiddelde waarde: ${Utils.formatCurrency(average)}`);
+
+        const resultNote = totalPaid > 0
+          ? `${result >= 0 ? 'Plus' : 'Min'} ${Math.abs(result / totalPaid * 100).toFixed(1).replace('.', ',')}% ten opzichte van aankoop.`
+          : 'Voer koopprijzen in voor rendementsanalyse.';
+        Analysis.setText('analysisResultNote', resultNote);
+        const resultEl = document.querySelector('[data-bind="analysisResult"]');
+        if (resultEl) {
+          resultEl.classList.toggle('positive', result > 0);
+          resultEl.classList.toggle('negative', result < 0);
+        }
+
+        Analysis.renderCollectionBars();
+        Analysis.renderOriginBars();
+        Analysis.renderMetalInsights();
+      },
+      setText(bind, value) {
+        const el = document.querySelector(`[data-bind="${bind}"]`);
+        if (el) el.textContent = value;
+      },
+      renderCollectionBars() {
+        const target = document.querySelector('[data-bind="analysisCollectionBars"]');
+        if (!target) return;
+        const rows = App.database.collections.map(collection => {
+          const items = Collections.itemsFor(collection.id);
+          const value = items.reduce((sum, item) => sum + (Number(item.collectorValue) || 0), 0);
+          return { name: collection.name, count: items.length, value };
+        }).filter(row => row.count || row.value);
+
+        if (!rows.length) {
+          target.innerHTML = '<p class="empty-note">Nog geen verdeling beschikbaar. Voeg eerst items toe.</p>';
+          return;
+        }
+        const max = Math.max(...rows.map(row => row.value), 1);
+        target.innerHTML = rows
+          .sort((a, b) => b.value - a.value)
+          .map(row => Analysis.barTemplate(row.name, `${row.count} item${row.count === 1 ? '' : 's'} · ${Utils.formatCurrency(row.value)}`, row.value / max * 100))
+          .join('');
+      },
+      renderOriginBars() {
+        const target = document.querySelector('[data-bind="analysisOriginBars"]');
+        if (!target) return;
+        const map = new Map();
+        App.database.items.forEach(item => {
+          const name = Collections.originName(item.data.origin);
+          const current = map.get(name) || { name, count: 0, value: 0 };
+          current.count += 1;
+          current.value += Number(item.collectorValue) || 0;
+          map.set(name, current);
+        });
+        const rows = Array.from(map.values()).filter(row => row.count || row.value);
+        if (!rows.length) {
+          target.innerHTML = '<p class="empty-note">Nog geen herkomstgegevens. Voeg items met herkomst toe.</p>';
+          return;
+        }
+        const max = Math.max(...rows.map(row => row.value), 1);
+        target.innerHTML = rows
+          .sort((a, b) => b.value - a.value)
+          .map(row => Analysis.barTemplate(row.name, `${row.count} item${row.count === 1 ? '' : 's'} · ${Utils.formatCurrency(row.value)}`, row.value / max * 100))
+          .join('');
+      },
+      barTemplate(label, value, percentage) {
+        return `
+          <div class="bar-row">
+            <div class="bar-head"><span>${Utils.escapeHTML(label)}</span><strong>${Utils.escapeHTML(value)}</strong></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${Math.max(3, Math.min(100, percentage)).toFixed(1)}%"></div></div>
+          </div>
+        `;
+      },
+      renderMetalInsights() {
+        const target = document.querySelector('[data-bind="analysisMetalInsights"]');
+        if (!target) return;
+        const metalItems = Collections.itemsFor('precious-metals');
+        if (!metalItems.length) {
+          target.innerHTML = '<p class="empty-note">Nog geen goud- of zilveritems opgeslagen.</p>';
+          return;
+        }
+
+        const totals = metalItems.reduce((acc, item) => {
+          const metal = String(item.data.metal || 'Onbekend').toLowerCase();
+          const grams = Number(item.data.grams) || 0;
+          const purity = Number(item.data.purity) || 0;
+          const fine = grams * purity;
+          if (metal.includes('goud')) acc.gold += fine;
+          else if (metal.includes('zilver')) acc.silver += fine;
+          else acc.unknown += fine;
+          acc.totalGross += grams;
+          acc.totalFine += fine;
+          return acc;
+        }, { silver: 0, gold: 0, unknown: 0, totalGross: 0, totalFine: 0 });
+
+        const estimatedMetalValue =
+          totals.silver * (App.database.prices.silver?.valuePerGram || 0) +
+          totals.gold * (App.database.prices.gold?.valuePerGram || 0);
+
+        target.innerHTML = [
+          ['Bruto gewicht', `${Analysis.formatGrams(totals.totalGross)} g`],
+          ['Fijn zilver', `${Analysis.formatGrams(totals.silver)} g`],
+          ['Fijn goud', `${Analysis.formatGrams(totals.gold)} g`],
+          ['Geschatte metaalwaarde', Utils.formatCurrency(estimatedMetalValue)]
+        ].map(([label, value]) => `<div class="insight-row"><span>${label}</span><strong>${value}</strong></div>`).join('');
+      },
+      formatGrams(value) {
+        return new Intl.NumberFormat('nl-NL', { maximumFractionDigits: 2 }).format(value || 0);
+      }
+    };
+
+    /* 10. PWA / Service worker */
+    const PWA = {
+      register() {
+        if (!('serviceWorker' in navigator)) return;
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./service-worker.js')
+            .then(() => console.info('Service worker actief voor Collectie.'))
+            .catch(error => console.warn('Service worker registratie mislukt:', error));
+        });
+      }
+    };
+
+    App.render = function renderApp() {
+      SafeRender.all();
+    };
+
+    /* 10. App start */
+    function initApp() {
+      App.database = Storage.load();
+      UI.init();
+      AddItem.init();
+      App.render();
+      Prices.refreshLivePrices(false);
+      PWA.register();
+      console.info('Collectie gestart:', App.version, App.database);
+    }
+
+    document.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>
